@@ -1,0 +1,48 @@
+{
+  "nav": {
+    "home": "홈",
+    "articles": "글 목록",
+    "about": "소개"
+  },
+  "search": {
+    "placeholder": "검색...",
+    "shortcut": "Ctrl K",
+    "noResults": "검색 결과가 없습니다",
+    "hint": "제목, 설명, 태그, 내용으로 검색..."
+  },
+  "article": {
+    "readingTime": "분 읽기",
+    "updated": "업데이트됨",
+    "words": "단어",
+    "featured": "추천",
+    "relatedPosts": "관련 글",
+    "references": "참고 링크",
+    "backlinks": "역링크",
+    "backlinkCount": "개의 글이 이 글을 참조합니다",
+    "series": "시리즈",
+    "category": "카테고리",
+    "previous": "이전 글",
+    "next": "다음 글"
+  },
+  "footer": {
+    "builtWith": "으로 제작",
+    "and": "그리고"
+  },
+  "common": {
+    "readMore": "더 보기",
+    "allArticles": "모든 글",
+    "filterByTag": "태그로 필터",
+    "sortBy": "정렬",
+    "newest": "최신순",
+    "oldest": "오래된순",
+    "title": "제목순"
+  },
+  "theme": {
+    "toggle": "테마 전환",
+    "warm": "따뜻한 테마",
+    "cold": "차가운 테마",
+    "light": "라이트 모드",
+    "dark": "다크 모드",
+    "auto": "자동"
+  }
+}

@@ -1,0 +1,115 @@
+---
+import { SITE } from '../config';
+import SearchModal from '../components/SearchModal.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  canonical?: string;
+}
+
+const {
+  title = SITE.title,
+  description = SITE.description,
+  ogImage = `${SITE.url}/og-image.png`,
+  canonical = Astro.url.href,
+} = Astro.props;
+
+const pageTitle = title === SITE.title ? title : `${title} | ${SITE.title}`;
+---
+
+<!doctype html>
+<html lang={SITE.locale} data-theme-variant="warm" data-mode="light" transition:animate="none">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Primary Meta Tags -->
+    <title>{pageTitle}</title>
+    <meta name="title" content={pageTitle} />
+    <meta name="description" content={description} />
+    <meta name="author" content={SITE.author} />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href={canonical} />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:site_name" content={SITE.name} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={canonical} />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- RSS Feed -->
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={SITE.name}
+      href={`${SITE.url}/rss.xml`}
+    />
+
+    <!-- Sitemap -->
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <!-- Monochrome Edge UI -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@monochrome-edge/ui@latest/dist/monochrome.min.css" />
+
+    <!-- Global Styles -->
+    <link rel="stylesheet" href="/src/styles/global.css" />
+
+    <!-- Theme Script (inline to prevent flash) -->
+    <script is:inline>
+      // Initialize theme before render
+      const theme = localStorage.getItem('theme') || 'warm';
+      const mode = localStorage.getItem('mode') || 'auto';
+      const actualMode = mode === 'auto'
+        ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        : mode;
+      document.documentElement.setAttribute('data-theme-variant', theme);
+      document.documentElement.setAttribute('data-mode', actualMode);
+    </script>
+  </head>
+  <body>
+    <div class="page-wrapper">
+      <slot />
+    </div>
+
+    <!-- Search Modal -->
+    <SearchModal />
+
+    <!-- Theme Toggle Script -->
+    <script src="../scripts/theme-toggle.ts"></script>
+
+    <style is:global>
+      body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .page-wrapper {
+        flex: 1;
+        padding-bottom: 4rem;
+      }
+
+      @media (max-width: 768px) {
+        .page-wrapper {
+          padding-bottom: 3.5rem;
+        }
+      }
+    </style>
+  </body>
+</html>
