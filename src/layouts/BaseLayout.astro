@@ -1,5 +1,5 @@
 ---
-import { SITE } from '../config';
+import { SITE, ANALYTICS } from '../config';
 import SearchModal from '../components/SearchModal.astro';
 
 interface Props {
@@ -17,6 +17,7 @@ const {
 } = Astro.props;
 
 const pageTitle = title === SITE.title ? title : `${title} | ${SITE.title}`;
+const isProd = import.meta.env.PROD;
 ---
 
 <!doctype html>
@@ -81,6 +82,19 @@ const pageTitle = title === SITE.title ? title : `${title} | ${SITE.title}`;
       document.documentElement.setAttribute('data-theme-variant', theme);
       document.documentElement.setAttribute('data-mode', actualMode);
     </script>
+
+    <!-- Google Analytics -->
+    {isProd && ANALYTICS.googleAnalyticsId && (
+      <>
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${ANALYTICS.googleAnalyticsId}`}></script>
+        <script is:inline define:vars={{ gaId: ANALYTICS.googleAnalyticsId }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', gaId);
+        </script>
+      </>
+    )}
   </head>
   <body>
     <div class="page-wrapper">
@@ -92,6 +106,9 @@ const pageTitle = title === SITE.title ? title : `${title} | ${SITE.title}`;
 
     <!-- Theme Toggle Script -->
     <script src="../scripts/theme-toggle.ts"></script>
+
+    <!-- Copy Code Button Script -->
+    <script src="../scripts/copy-code.ts"></script>
 
     <style is:global>
       body {

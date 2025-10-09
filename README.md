@@ -67,6 +67,9 @@ That's it! Everything else is automatic.
 - **Search** - Full-text search (Ctrl+K)
 - **Themes** - Warm/Cold themes + Dark mode
 - **SEO Ready** - Sitemap, RSS, Open Graph
+- **Comments** - Giscus integration (GitHub Discussions)
+- **Analytics** - Google Analytics support
+- **Code Copy** - One-click copy button for code blocks
 
 ---
 
@@ -238,6 +241,40 @@ lang: ko  # or 'en'
 ```
 
 Dates are auto-generated from Git history!
+
+---
+
+## 🔧 Optional Features
+
+### Google Analytics
+
+Add to `.env`:
+
+```env
+GOOGLE_ANALYTICS_ID=G-XXXXXXXXXX
+```
+
+Analytics will only load in production builds.
+
+### Comments (Giscus)
+
+1. Visit [giscus.app](https://giscus.app)
+2. Configure your repository
+3. Get the values and add to `.env`:
+
+```env
+GISCUS_ENABLED=true
+GISCUS_REPO=username/repo
+GISCUS_REPO_ID=R_xxxxx
+GISCUS_CATEGORY=Announcements
+GISCUS_CATEGORY_ID=DIC_xxxxx
+```
+
+Comments appear at the bottom of each article.
+
+### Code Copy Button
+
+Automatically enabled! Hover over code blocks to see the copy button.
 
 ---
 

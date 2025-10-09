@@ -259,6 +259,56 @@ pre code {
   padding: 0;
 }
 
+/* Code block with copy button */
+.code-block-wrapper {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.code-block-wrapper pre {
+  margin-bottom: 0;
+}
+
+.copy-button {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.5rem;
+  background-color: var(--theme-surface);
+  border: 1px solid var(--theme-border);
+  border-radius: calc(var(--border-radius) / 2);
+  color: var(--theme-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+}
+
+.code-block-wrapper:hover .copy-button {
+  opacity: 1;
+}
+
+.copy-button:hover {
+  background-color: var(--theme-bg);
+  border-color: var(--theme-accent);
+  color: var(--theme-accent);
+}
+
+.copy-button .check-icon {
+  display: none;
+}
+
+.copy-button.copied .copy-icon {
+  display: none;
+}
+
+.copy-button.copied .check-icon {
+  display: block;
+  color: var(--theme-accent);
+}
+
 blockquote {
   border-left: 4px solid var(--theme-accent);
   padding-left: 1rem;

@@ -29,3 +29,15 @@ export const SOCIAL_LINKS = {
     : null,
   email: getEnv('EMAIL', 'your.email@example.com'),
 };
+
+export const ANALYTICS = {
+  googleAnalyticsId: getEnv('GOOGLE_ANALYTICS_ID', ''),
+};
+
+export const COMMENTS = {
+  enabled: getEnv('GISCUS_ENABLED', 'false') === 'true',
+  repo: getEnv('GISCUS_REPO', ''),
+  repoId: getEnv('GISCUS_REPO_ID', ''),
+  category: getEnv('GISCUS_CATEGORY', ''),
+  categoryId: getEnv('GISCUS_CATEGORY_ID', ''),
+};

@@ -5,6 +5,7 @@ import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import TOC from '../../components/TOC.astro';
 import ReadingProgress from '../../components/ReadingProgress.astro';
+import Comments from '../../components/Comments.astro';
 import { resolvePostDates, formatDate, formatDateISO } from '../../utils/git-dates';
 import { calculateReadingTime, formatReadingTime, getWordCount } from '../../utils/reading-time';
 import { buildBacklinkMap, getRelationships } from '../../utils/relationships';
@@ -212,6 +213,9 @@ const headings = rendered.headings || [];
               )}
             </footer>
           )}
+
+          <!-- Comments -->
+          <Comments />
         </div>
 
         <!-- Sidebar with TOC -->
