@@ -4,40 +4,125 @@ const getEnv = (key: string, fallback: string) => {
 };
 
 export const SITE = {
-  name: getEnv('SITE_NAME', 'Your Name'),
-  title: getEnv('SITE_TITLE', 'Your Name'),
-  description: getEnv('SITE_DESCRIPTION', 'A minimal, elegant technical blog built with Astro and Monochrome Edge UI'),
-  url: getEnv('SITE_URL', 'https://yourusername.github.io'),
-  author: getEnv('SITE_AUTHOR', 'Your Name'),
-  locale: 'ko-KR',
-  defaultTheme: (getEnv('DEFAULT_THEME', 'warm') as 'warm' | 'cold'),
-  defaultMode: (getEnv('DEFAULT_MODE', 'auto') as 'light' | 'dark' | 'auto'),
+  name: getEnv("SITE_NAME", "Your Name"),
+  title: getEnv("SITE_TITLE", "Your Name"),
+  description: getEnv(
+    "SITE_DESCRIPTION",
+    "A minimal, elegant technical blog built with Astro and Monochrome Edge UI",
+  ),
+  url: getEnv("SITE_URL", "https://yourusername.github.io"),
+  author: getEnv("SITE_AUTHOR", "Your Name"),
+  locale: "ko-KR",
+  defaultTheme: getEnv("DEFAULT_THEME", "warm") as "warm" | "cold",
+  defaultMode: getEnv("DEFAULT_MODE", "auto") as "light" | "dark" | "auto",
 };
 
 export const NAVIGATION = [
-  { name: 'Home', href: '/' },
-  { name: 'About', href: '/about' },
-  { name: 'Code Work', href: '/code' },
+  { name: "Home", href: "/" },
+  { name: "About", href: "/about" },
+  { name: "Code Work", href: "/code" },
 ];
 
 export const SOCIAL_LINKS = {
-  github: getEnv('GITHUB_USERNAME', '')
-    ? `https://github.com/${getEnv('GITHUB_USERNAME', '')}`
-    : 'https://github.com/yourusername',
-  twitter: getEnv('TWITTER_USERNAME', '')
-    ? `https://twitter.com/${getEnv('TWITTER_USERNAME', '')}`
+  github: getEnv("GITHUB_USERNAME", "")
+    ? `https://github.com/${getEnv("GITHUB_USERNAME", "")}`
+    : "https://github.com/yourusername",
+  twitter: getEnv("TWITTER_USERNAME", "")
+    ? `https://twitter.com/${getEnv("TWITTER_USERNAME", "")}`
     : null,
-  email: getEnv('EMAIL', 'your.email@example.com'),
+  email: getEnv("EMAIL", "your.email@example.com"),
 };
 
+// Legacy exports (deprecated, use INTEGRATIONS instead)
 export const ANALYTICS = {
-  googleAnalyticsId: getEnv('GOOGLE_ANALYTICS_ID', ''),
+  googleAnalyticsId: getEnv(
+    "GOOGLE_ANALYTICS_ID",
+    getEnv("GA4_MEASUREMENT_ID", ""),
+  ),
 };
 
 export const COMMENTS = {
-  enabled: getEnv('GISCUS_ENABLED', 'false') === 'true',
-  repo: getEnv('GISCUS_REPO', ''),
-  repoId: getEnv('GISCUS_REPO_ID', ''),
-  category: getEnv('GISCUS_CATEGORY', ''),
-  categoryId: getEnv('GISCUS_CATEGORY_ID', ''),
+  enabled:
+    getEnv("GISCUS_ENABLED", "false") === "true" ||
+    getEnv("COMMENTS_PROVIDER", "none") === "giscus",
+  repo: getEnv("GISCUS_REPO", ""),
+  repoId: getEnv("GISCUS_REPO_ID", ""),
+  category: getEnv("GISCUS_CATEGORY", ""),
+  categoryId: getEnv("GISCUS_CATEGORY_ID", ""),
+};
+
+// New modular integrations system
+export const INTEGRATIONS = {
+  // Comments System
+  comments: {
+    provider: getEnv("COMMENTS_PROVIDER", "none") as
+      | "none"
+      | "giscus"
+      | "utterances"
+      | "disqus"
+      | "cusdis",
+    giscus: {
+      repo: getEnv("GISCUS_REPO", ""),
+      repoId: getEnv("GISCUS_REPO_ID", ""),
+      category: getEnv("GISCUS_CATEGORY", ""),
+      categoryId: getEnv("GISCUS_CATEGORY_ID", ""),
+      mapping: getEnv("GISCUS_MAPPING", "pathname"),
+      theme: getEnv("GISCUS_THEME", "preferred_color_scheme"),
+      lang: getEnv("GISCUS_LANG", "ko"),
+    },
+    utterances: {
+      repo: getEnv("UTTERANCES_REPO", ""),
+      theme: getEnv("UTTERANCES_THEME", "github-light"),
+      issueTerm: getEnv("UTTERANCES_ISSUE_TERM", "pathname"),
+    },
+    disqus: {
+      shortname: getEnv("DISQUS_SHORTNAME", ""),
+    },
+    cusdis: {
+      appId: getEnv("CUSDIS_APP_ID", ""),
+      host: getEnv("CUSDIS_HOST", "https://cusdis.com"),
+    },
+  },
+
+  // Search System
+  search: {
+    provider: getEnv("SEARCH_PROVIDER", "local") as
+      | "local"
+      | "algolia"
+      | "none",
+    algolia: {
+      appId: getEnv("ALGOLIA_APP_ID", ""),
+      apiKey: getEnv("ALGOLIA_API_KEY", ""),
+      indexName: getEnv("ALGOLIA_INDEX_NAME", ""),
+    },
+  },
+
+  // Analytics
+  analytics: {
+    ga4: {
+      enabled: getEnv("GA4_ENABLED", "false") === "true",
+      measurementId: getEnv(
+        "GA4_MEASUREMENT_ID",
+        getEnv("GOOGLE_ANALYTICS_ID", ""),
+      ),
+    },
+    plausible: {
+      enabled: getEnv("PLAUSIBLE_ENABLED", "false") === "true",
+      domain: getEnv("PLAUSIBLE_DOMAIN", ""),
+      src: (() => {
+        const src = getEnv("PLAUSIBLE_SRC", "https://plausible.io/js/script.js");
+        return src.startsWith("https://") ? src : "https://plausible.io/js/script.js";
+      })(),
+    },
+  },
+
+  // Monitoring
+  monitoring: {
+    sentry: {
+      enabled: getEnv("SENTRY_ENABLED", "false") === "true",
+      dsn: getEnv("SENTRY_DSN", ""),
+      environment: getEnv("SENTRY_ENVIRONMENT", "production"),
+      tracesSampleRate: parseFloat(getEnv("SENTRY_TRACES_SAMPLE_RATE", "1.0")),
+    },
+  },
 };

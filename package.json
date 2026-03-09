@@ -12,10 +12,11 @@
     "@astrojs/check": "^0.9.4",
     "@astrojs/rss": "^4.0.9",
     "@astrojs/sitemap": "^3.2.1",
-    "@monochrome-edge/ui": "^1.8.1",
+    "@monochrome-edge/ui": "^1.13.12",
     "astro": "^5.0.0",
     "fuse.js": "^7.0.0",
-    "gray-matter": "^4.0.3"
+    "gray-matter": "^4.0.3",
+    "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {
     "@types/node": "^24.7.0",

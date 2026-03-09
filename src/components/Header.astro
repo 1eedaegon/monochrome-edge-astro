@@ -15,13 +15,13 @@ const isActive = (href: string) => {
 ---
 
 <header class="header">
-  <nav class="container">
+  <nav class="container" aria-label="Main navigation">
     <div class="nav-wrapper">
-      <a href="/" class="logo">
+      <a href="/" class="logo" aria-label="Home">
         <span class="logo-text">{SITE.name}</span>
       </a>
 
-      <div class="nav-links">
+      <div class="nav-links" role="list">
         {NAVIGATION.map((item) => (
           <a
             href={item.href}
@@ -39,27 +39,61 @@ const isActive = (href: string) => {
 
         <button
           id="theme-toggle"
-          class="icon-btn"
+          class="icon-btn-toggle icon-btn-toggle-ghost icon-btn-toggle-theme"
+          data-state="warm"
           aria-label="Toggle theme"
           title="Toggle theme (Warm/Cold)"
         >
-          <Icon name="palette" size={20} />
+          <div class="icon-btn-toggle-icon">
+            <!-- Flame icon (Warm theme) - first-child -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+              <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+            </svg>
+            <!-- Snowflake icon (Cold theme) - last-child -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="2" x2="22" y1="12" y2="12" />
+              <line x1="12" x2="12" y1="2" y2="22" />
+              <path d="m20 16-4-4 4-4" />
+              <path d="m4 8 4 4-4 4" />
+              <path d="m16 4-4 4-4-4" />
+              <path d="m8 20 4-4 4 4" />
+            </svg>
+          </div>
         </button>
 
         <button
           id="mode-toggle"
-          class="icon-btn"
+          class="icon-btn-toggle icon-btn-toggle-ghost icon-btn-toggle-mode"
+          data-state="light"
           aria-label="Toggle dark mode"
           title="Toggle dark mode"
         >
-          <Icon name="sun" size={20} class="mode-icon-light" />
-          <Icon name="moon" size={20} class="mode-icon-dark" />
+          <div class="icon-btn-toggle-icon">
+            <!-- Sun icon (Light mode) - first-child -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4"/>
+              <line x1="12" y1="2" x2="12" y2="4"/>
+              <line x1="12" y1="20" x2="12" y2="22"/>
+              <line x1="4.93" y1="4.93" x2="6.34" y2="6.34"/>
+              <line x1="17.66" y1="17.66" x2="19.07" y2="19.07"/>
+              <line x1="2" y1="12" x2="4" y2="12"/>
+              <line x1="20" y1="12" x2="22" y2="12"/>
+              <line x1="6.34" y1="17.66" x2="4.93" y2="19.07"/>
+              <line x1="19.07" y1="4.93" x2="17.66" y2="6.34"/>
+            </svg>
+            <!-- Moon icon (Dark mode) - last-child -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+            </svg>
+          </div>
         </button>
 
         <button
           id="mobile-menu-toggle"
           class="icon-btn mobile-only"
-          aria-label="Menu"
+          aria-label="Toggle mobile menu"
+          aria-expanded="false"
+          aria-controls="mobile-menu"
         >
           <Icon name="menu" size={24} />
         </button>
@@ -193,35 +227,6 @@ const isActive = (href: string) => {
     transform: translateY(-1px);
   }
 
-  .icon-btn.active {
-    background-color: var(--theme-accent);
-    border-color: var(--theme-accent);
-    color: var(--theme-accent-contrast);
-  }
-
-  .icon-btn.active:hover {
-    opacity: 0.9;
-  }
-
-  .icon-btn:disabled {
-    cursor: not-allowed;
-    opacity: 0.4;
-    pointer-events: none;
-  }
-
-  .icon-btn :global(.mode-icon-light),
-  .icon-btn :global(.mode-icon-dark) {
-    display: none;
-  }
-
-  :global([data-mode='light']) .icon-btn :global(.mode-icon-light) {
-    display: block;
-  }
-
-  :global([data-mode='dark']) .icon-btn :global(.mode-icon-dark) {
-    display: block;
-  }
-
   .mobile-only {
     display: none;
   }
@@ -275,18 +280,34 @@ const isActive = (href: string) => {
 
     if (mobileMenuToggle && mobileMenu) {
       mobileMenuToggle.addEventListener('click', () => {
-        mobileMenu.classList.toggle('open');
+        const isOpen = mobileMenu.classList.toggle('open');
+        mobileMenuToggle.setAttribute('aria-expanded', isOpen.toString());
       });
     }
+  }
+
+  // Update toggle button state
+  function updateToggleState(button: HTMLElement, state: string) {
+    button.setAttribute('data-state', state);
+    button.classList.add('is-animating');
+    setTimeout(() => {
+      button.classList.remove('is-animating');
+    }, 500);
   }
 
   // Theme toggle
   function initThemeToggle() {
     const themeToggle = document.getElementById('theme-toggle');
     if (themeToggle) {
+      // Set initial state
+      const currentTheme = document.documentElement.getAttribute('data-theme-variant') || 'warm';
+      updateToggleState(themeToggle as HTMLElement, currentTheme);
+
       themeToggle.addEventListener('click', () => {
         if (typeof (window as any).toggleTheme === 'function') {
           (window as any).toggleTheme();
+          const newTheme = document.documentElement.getAttribute('data-theme-variant') || 'warm';
+          updateToggleState(themeToggle as HTMLElement, newTheme);
         }
       });
     }
@@ -296,23 +317,33 @@ const isActive = (href: string) => {
   function initModeToggle() {
     const modeToggle = document.getElementById('mode-toggle');
     if (modeToggle) {
+      // Set initial state
+      const currentMode = document.documentElement.getAttribute('data-mode') || 'light';
+      updateToggleState(modeToggle as HTMLElement, currentMode);
+
       modeToggle.addEventListener('click', () => {
         if (typeof (window as any).toggleMode === 'function') {
           (window as any).toggleMode();
+          const newMode = document.documentElement.getAttribute('data-mode') || 'light';
+          updateToggleState(modeToggle as HTMLElement, newMode);
         }
       });
     }
   }
 
   // Initialize all
-  initMobileMenu();
-  initThemeToggle();
-  initModeToggle();
-
-  // Reinitialize after page navigation (for view transitions)
-  document.addEventListener('astro:after-swap', () => {
+  function initAll() {
     initMobileMenu();
     initThemeToggle();
     initModeToggle();
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAll);
+  } else {
+    initAll();
+  }
+
+  // Reinitialize after page navigation (for view transitions)
+  document.addEventListener('astro:after-swap', initAll);
 </script>

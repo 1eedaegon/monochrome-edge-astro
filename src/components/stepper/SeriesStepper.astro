@@ -1,0 +1,148 @@
+---
+interface Step {
+  indicator: string;
+  labelTitle: string;
+  labelDesc: string;
+  title: string;
+  desc: string;
+  state: 'pending' | 'active' | 'completed';
+  href: string;
+}
+
+interface Props {
+  steps: Step[];
+  id?: string;
+  layout?: 'horizontal' | 'vertical' | 'snake';
+  type?: 'default' | 'text';
+}
+
+const {
+  steps,
+  id = 'stepper',
+  layout = 'snake',
+  type = 'default'
+} = Astro.props;
+---
+
+<link rel="stylesheet" href="/vendor/stepper/stepper-unified.css" />
+
+<div
+  class="stepper"
+  id={id}
+  data-type={type}
+  data-layout={layout}
+  data-steps={JSON.stringify(steps)}
+>
+</div>
+
+<script define:vars={{ stepperId: id }}>
+  (function() {
+    function initStepper() {
+      const stepperEl = document.getElementById(stepperId);
+
+
+      console.log('[Stepper] Initializing stepper:', stepperId);
+      console.log('[Stepper] Element found:', !!stepperEl);
+
+
+      if (!stepperEl) {
+        console.error('[Stepper] Element not found:', stepperId);
+        return;
+      }
+
+
+      if (stepperEl.classList.contains('stepper-initialized')) {
+        console.log('[Stepper] Already initialized');
+        return;
+      }
+
+      // Get steps data
+      const stepsData = stepperEl.dataset.steps;
+      console.log('[Stepper] Steps data:', stepsData);
+
+      // Check if Stepper is already loaded
+      if (window.Stepper) {
+        console.log('[Stepper] Using existing Stepper class');
+        try {
+          new window.Stepper(stepperEl, {
+            onStepClick: (step, index) => {
+              console.log('[Stepper] Step clicked:', step);
+              if (step.href) {
+                window.location.href = step.href;
+              }
+            }
+          });
+          stepperEl.classList.add('stepper-initialized');
+          console.log('[Stepper] Initialized successfully');
+        } catch (error) {
+          console.error('[Stepper] Initialization error:', error);
+        }
+        return;
+      }
+
+      // Try multiple local vendor directory pathslocal vendor
+      const cdnPaths = [
+        '/vendor/stepper/stepper.js',
+        'https://cdn.jsdelivr.net/npm/@monochrome-edge/ui@latest/components/stepper/stepper.js',
+        'https://cdn.jsdelivr.net/npm/@monochrome-edge/ui/dist/components/stepper/stepper.js'
+      ];
+
+      let currentPathIndex = 0;
+
+      function tryLoadScript() {
+        if (currentPathIndex >= cdnPaths.length) {
+          console.error('[Stepper] All CDN paths failed');
+          return;
+ successfully        }
+
+        const scriptPath = cdnPaths[currentPathIndex];
+        console.log('[Stepper] Trying CDN path:', scriptPath);
+
+        const script = document.createElement('script');
+        script.src = scriptPath;
+
+        script.onerror = () => {
+          console.error('[Stepper] Failed to load from:', scriptPath);
+          currentPathIndex++;
+          tryLoadScript();
+        };
+
+        script.onload = () => {
+          console.log('[Stepper] Script loaded from:', scriptPath);
+          if (window.Stepper) {
+            try {
+              new window.Stepper(stepperEl, {
+                onStepClick: (step, index) => {
+                  console.log('[Stepper] Step clicked:', step);
+                  if (step.href) {
+                    window.location.href = step.href;
+                  }
+                }
+              });
+              stepperEl.classList.add('stepper-initialized');
+              console.log('[Stepper] Initialized successfully');
+            } catch (error) {
+              console.error('[Stepper] Initialization error:', error);
+            }
+          } else {
+            console.error('[Stepper] Stepper class not found after script load');
+          }
+        };
+
+        document.head.appendChild(script);
+      }
+
+      tryLoadScript();
+    }
+
+    // Initialize on page load
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initStepper);
+    } else {
+      initStepper();
+    }
+
+    // Reinitialize after page navigation (for view transitions)
+    document.addEventListener('astro:after-swap', initStepper);
+  })();
+</script>

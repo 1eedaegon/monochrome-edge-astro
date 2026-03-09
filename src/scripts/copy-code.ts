@@ -1,26 +1,27 @@
 /**
  * Add copy button to code blocks
  */
+import { trackCodeCopy } from "../utils/analytics";
 
 function addCopyButtons() {
-  const codeBlocks = document.querySelectorAll('pre');
+  const codeBlocks = document.querySelectorAll("pre");
 
   codeBlocks.forEach((pre) => {
     // Skip if button already exists
-    if (pre.querySelector('.copy-button')) return;
+    if (pre.querySelector(".copy-button")) return;
 
     // Create wrapper
-    const wrapper = document.createElement('div');
-    wrapper.className = 'code-block-wrapper';
+    const wrapper = document.createElement("div");
+    wrapper.className = "code-block-wrapper";
 
     // Wrap the pre element
     pre.parentNode?.insertBefore(wrapper, pre);
     wrapper.appendChild(pre);
 
     // Create copy button
-    const button = document.createElement('button');
-    button.className = 'copy-button';
-    button.setAttribute('aria-label', 'Copy code');
+    const button = document.createElement("button");
+    button.className = "copy-button";
+    button.setAttribute("aria-label", "Copy code");
     button.innerHTML = `
       <svg class="copy-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -32,18 +33,38 @@ function addCopyButtons() {
     `;
 
     // Add click handler
-    button.addEventListener('click', async () => {
-      const code = pre.querySelector('code')?.textContent || pre.textContent || '';
+    button.addEventListener("click", async () => {
+      const code =
+        pre.querySelector("code")?.textContent || pre.textContent || "";
+
+      // Extract language from class for analytics
+      const codeElement = pre.querySelector("code");
+      const languageClass = codeElement?.className.match(/language-(\w+)/);
+      const language = languageClass ? languageClass[1] : undefined;
 
       try {
         await navigator.clipboard.writeText(code);
-        button.classList.add('copied');
+        button.classList.add("copied");
+
+        // Track analytics event
+        trackCodeCopy(language);
+
+        // Show toast notification
+        if (typeof (window as any).showToast === "function") {
+          (window as any).showToast(
+            "Code copied to clipboard!",
+            "success",
+            2000,
+          );
+        }
 
         setTimeout(() => {
-          button.classList.remove('copied');
+          button.classList.remove("copied");
         }, 2000);
-      } catch (err) {
-        console.error('Failed to copy:', err);
+      } catch (_err) {
+        if (typeof (window as any).showToast === "function") {
+          (window as any).showToast("Failed to copy code", "error", 2000);
+        }
       }
     });
 
@@ -52,11 +73,11 @@ function addCopyButtons() {
 }
 
 // Initialize on page load
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', addCopyButtons);
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", addCopyButtons);
 } else {
   addCopyButtons();
 }
 
 // Re-initialize after view transitions
-document.addEventListener('astro:after-swap', addCopyButtons);
+document.addEventListener("astro:after-swap", addCopyButtons);

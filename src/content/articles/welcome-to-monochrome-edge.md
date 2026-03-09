@@ -40,14 +40,14 @@ The Monochrome Edge UI provides:
 
 To create a new blog post, simply add a markdown file to `src/content/articles/`:
 
-\`\`\`markdown
+```markdown
 ---
 title: "My First Post"
 tags: [hello, world]
 ---
 
 # Content goes here...
-\`\`\`
+```
 
 That's it! The date, reading time, and other metadata will be automatically generated.
 
@@ -55,7 +55,7 @@ That's it! The date, reading time, and other metadata will be automatically gene
 
 Here's a simple TypeScript example:
 
-\`\`\`typescript
+```typescript
 interface BlogPost {
   title: string;
   date: Date;
@@ -65,7 +65,7 @@ interface BlogPost {
 function createPost(data: BlogPost) {
   console.log(\`Creating post: \${data.title}\`);
 }
-\`\`\`
+```
 
 ## Links and References
 
