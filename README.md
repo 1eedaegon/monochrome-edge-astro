@@ -21,15 +21,23 @@ npm run dev
 
 ### 2. Configure
 
-Create `.env` file:
+Copy `.env.example` and edit:
+
+```bash
+cp .env.example .env
+```
 
 ```env
+# Required
 SITE_NAME=Your Name
 SITE_URL=https://yourusername.github.io
+BASE_PATH=/your-repo-name   # GitHub Pages: "/repo-name", Custom domain: "/"
 SITE_AUTHOR=Your Name
 GITHUB_USERNAME=yourusername
 EMAIL=your@example.com
 ```
+
+> See [`.env.example`](.env.example) for all available options (comments, search, analytics, monitoring).
 
 ### 3. Start Writing
 
@@ -278,20 +286,34 @@ Automatically enabled! Hover over code blocks to see the copy button.
 
 ---
 
-## 🚢 Deploy to GitHub Pages
+## 🚢 Deploy
 
-### Automatic (Recommended)
+### GitHub Pages (Recommended)
 
-1. Push to `main` branch
-2. Go to **Settings → Pages**
-3. Source: **GitHub Actions**
-4. Done! Auto-deploys on every push
+1. `.env` 설정 (또는 GitHub Actions 환경변수로 설정):
+   ```env
+   SITE_URL=https://yourusername.github.io
+   BASE_PATH=/your-repo-name
+   ```
+2. GitHub 레포 → **Settings** → **Pages** → Source를 **GitHub Actions**로 변경
+3. `main` 브랜치에 push하면 자동 배포
+
+> `BASE_PATH`와 `SITE_URL`은 워크플로우에서 GitHub Pages 설정을 자동 감지하므로, `.env`에 설정하지 않아도 배포 시 자동으로 적용됩니다. 로컬 개발 시에만 필요에 따라 설정하세요.
+
+### Custom Domain
+
+1. GitHub 레포 → **Settings** → **Pages** → **Custom domain**에 도메인 입력
+2. `.env` 업데이트:
+   ```env
+   SITE_URL=https://yourdomain.com
+   BASE_PATH=/
+   ```
 
 ### Manual
 
 ```bash
 npm run build
-# Upload ./dist/ to your hosting
+# ./dist/ 폴더를 호스팅에 업로드
 ```
 
 ---
