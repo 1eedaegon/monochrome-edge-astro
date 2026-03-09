@@ -28,7 +28,7 @@ export async function GET(context: APIContext) {
     items: sortedPosts.map((post) => ({
       title: post.data.title,
       description: post.data.description || '',
-      link: `/articles/${post.id.replace('.md', '')}`,
+      link: `${import.meta.env.BASE_URL}articles/${post.id.replace('.md', '')}`,
       pubDate: post.dateInfo.date,
       categories: post.data.tags,
     })),

@@ -67,7 +67,7 @@ const { category, posts, count } = Astro.props;
     </section>
 
     <div class="back-link">
-      <a href="/articles">Back to all articles</a>
+      <a href={`${import.meta.env.BASE_URL}articles`}>Back to all articles</a>
     </div>
   </main>
 

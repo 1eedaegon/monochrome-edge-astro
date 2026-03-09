@@ -8,7 +8,7 @@ import { rehypeNoTranslate } from "./src/utils/rehype-notranslate";
 // https://astro.build/config
 export default defineConfig({
   site: process.env.SITE_URL || "http://localhost:4321",
-  base: process.env.BASE_PATH || "/",
+  base: process.env.BASE_PATH ? process.env.BASE_PATH.replace(/\/$/, "") + "/" : "/",
   integrations: [sitemap()],
   markdown: {
     syntaxHighlight: "shiki",

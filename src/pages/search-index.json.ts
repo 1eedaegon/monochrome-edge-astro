@@ -13,7 +13,7 @@ export const GET: APIRoute = async () => {
     description: article.data.description || '',
     tags: article.data.tags || [],
     content: (article.body || '').substring(0, 500), // First 500 chars
-    url: `/articles/${article.id.replace('.md', '')}`,
+    url: `${import.meta.env.BASE_URL}articles/${article.id.replace('.md', '')}`,
   }));
 
   return new Response(JSON.stringify(searchData), {

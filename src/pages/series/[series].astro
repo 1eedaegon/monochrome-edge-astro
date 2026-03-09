@@ -56,7 +56,7 @@ const { series, posts } = Astro.props;
           <div class="series-number">Part {index + 1}</div>
           <div class="series-content">
             <h2>
-              <a href={`/articles/${post.id.replace('.md', '')}`}>
+              <a href={`${import.meta.env.BASE_URL}articles/${post.id.replace('.md', '')}`}>
                 {post.data.title}
               </a>
             </h2>
@@ -80,7 +80,7 @@ const { series, posts } = Astro.props;
     </section>
 
     <div class="back-link">
-      <a href="/articles">Back to all articles</a>
+      <a href={`${import.meta.env.BASE_URL}articles`}>Back to all articles</a>
     </div>
   </main>
 

@@ -54,6 +54,7 @@ type Props = {
 };
 
 const { post, dateInfo, readingTime, wordCount, relationships, seriesNav } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 // Render the post content
 const rendered = await render(post);
@@ -66,8 +67,8 @@ const titleToShow = h1Heading?.text || post.data.title;
 
 // Generate breadcrumb items automatically
 const breadcrumbItems = [
-  { name: 'Home', url: '/' },
-  { name: 'Articles', url: '/articles' },
+  { name: 'Home', url: `${base}/` },
+  { name: 'Articles', url: `${base}/articles` },
 ];
 
 // Add category if exists
@@ -75,7 +76,7 @@ if (post.data.category) {
   const categorySlug = post.data.category.toLowerCase().replace(/\s+/g, '-').replace(/\//g, '-');
   breadcrumbItems.push({
     name: post.data.category,
-    url: `/categories/${categorySlug}`
+    url: `${base}/categories/${categorySlug}`
   });
 }
 
@@ -179,7 +180,7 @@ breadcrumbItems.push({
             {post.data.tags.length > 0 && (
               <div class="article-tags">
                 {post.data.tags.map((tag) => (
-                  <Badge variant="default" href={`/articles?tag=${tag}`}>
+                  <Badge variant="default" href={`${base}/articles?tag=${tag}`}>
                     #{tag}
                   </Badge>
                 ))}
@@ -189,7 +190,7 @@ breadcrumbItems.push({
             {post.data.category && (
               <div class="article-category">
                 <span class="category-label">Category:</span>
-                <a href={`/categories/${post.data.category.toLowerCase().replace(/\s+/g, '-')}`} class="category-link">
+                <a href={`${base}/categories/${post.data.category.toLowerCase().replace(/\s+/g, '-')}`} class="category-link">
                   {post.data.category}
                 </a>
               </div>
@@ -229,20 +230,20 @@ breadcrumbItems.push({
                     title: seriesPost.data.title,
                     desc: seriesPost.data.description || '',
                     state: state,
-                    href: `/articles/${seriesPost.id.replace('.md', '')}`
+                    href: `${base}/articles/${seriesPost.id.replace('.md', '')}`
                   };
                 })}
               />
 
               <div class="series-nav-links">
                 {seriesNav.prev && (
-                  <a href={`/articles/${seriesNav.prev.id.replace('.md', '')}`} class="series-nav-link prev">
+                  <a href={`${base}/articles/${seriesNav.prev.id.replace('.md', '')}`} class="series-nav-link prev">
                     <span class="nav-label">Previous</span>
                     <span class="nav-title">{seriesNav.prev.data.title}</span>
                   </a>
                 )}
                 {seriesNav.next && (
-                  <a href={`/articles/${seriesNav.next.id.replace('.md', '')}`} class="series-nav-link next">
+                  <a href={`${base}/articles/${seriesNav.next.id.replace('.md', '')}`} class="series-nav-link next">
                     <span class="nav-label">Next</span>
                     <span class="nav-title">{seriesNav.next.data.title}</span>
                   </a>
@@ -272,7 +273,7 @@ breadcrumbItems.push({
                 <ul class="section-list">
                   {relatedPosts.map((link) => (
                     <li class="section-list-item">
-                      <a href={`/articles/${link.id}`} class="section-link">{link.title}</a>
+                      <a href={`${base}/articles/${link.id}`} class="section-link">{link.title}</a>
                     </li>
                   ))}
                 </ul>

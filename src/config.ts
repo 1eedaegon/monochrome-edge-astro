@@ -17,10 +17,12 @@ export const SITE = {
   defaultMode: getEnv("DEFAULT_MODE", "auto") as "light" | "dark" | "auto",
 };
 
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
 export const NAVIGATION = [
-  { name: "Home", href: "/" },
-  { name: "About", href: "/about" },
-  { name: "Code Work", href: "/code" },
+  { name: "Home", href: `${base}/` },
+  { name: "About", href: `${base}/about` },
+  { name: "Code Work", href: `${base}/code` },
 ];
 
 export const SOCIAL_LINKS = {

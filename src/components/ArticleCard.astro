@@ -14,7 +14,8 @@ interface Props {
 }
 
 const { id, title, description, tags, date, updated, readingTime, featured } = Astro.props;
-const url = `/articles/${id}`;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const url = `${base}/articles/${id}`;
 ---
 
 <article class:list={['article-card', { featured }]}>

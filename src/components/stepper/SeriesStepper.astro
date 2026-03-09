@@ -24,7 +24,7 @@ const {
 } = Astro.props;
 ---
 
-<link rel="stylesheet" href="/vendor/stepper/stepper-unified.css" />
+<link rel="stylesheet" href={`${import.meta.env.BASE_URL}vendor/stepper/stepper-unified.css`} />
 
 <div
   class="stepper"
@@ -35,7 +35,7 @@ const {
 >
 </div>
 
-<script define:vars={{ stepperId: id }}>
+<script define:vars={{ stepperId: id, basePath: import.meta.env.BASE_URL }}>
   (function() {
     function initStepper() {
       const stepperEl = document.getElementById(stepperId);
@@ -82,7 +82,7 @@ const {
 
       // Try multiple local vendor directory pathslocal vendor
       const cdnPaths = [
-        '/vendor/stepper/stepper.js',
+        `${basePath}vendor/stepper/stepper.js`,
         'https://cdn.jsdelivr.net/npm/@monochrome-edge/ui@latest/components/stepper/stepper.js',
         'https://cdn.jsdelivr.net/npm/@monochrome-edge/ui/dist/components/stepper/stepper.js'
       ];
