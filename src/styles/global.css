@@ -88,7 +88,7 @@ body {
     --theme-shadow-xl: 0 10px 40px var(--theme-shadow-color);
 }
 
-[data-theme-variant="warm"][data-mode="dark"] {
+[data-theme-variant="warm"][data-theme="dark"] {
     --theme-bg: #1b1a19;
     --theme-background: #1b1a19;
     --theme-text-primary: rgba(255, 255, 255, 0.92);
@@ -162,7 +162,7 @@ body {
     --theme-shadow-xl: 0 10px 40px var(--theme-shadow-color);
 }
 
-[data-theme-variant="cold"][data-mode="dark"] {
+[data-theme-variant="cold"][data-theme="dark"] {
     --theme-bg: #161a1f;
     --theme-background: #161a1f;
     --theme-text-primary: rgba(255, 255, 255, 0.95);

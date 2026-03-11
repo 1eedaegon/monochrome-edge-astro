@@ -23,7 +23,7 @@ const pageTitle = title === SITE.title ? title : `${title} | ${SITE.title}`;
 ---
 
 <!doctype html>
-<html lang={SITE.locale} data-theme-variant="warm" data-mode="light" transition:animate="fade">
+<html lang={SITE.locale} data-theme-variant="warm" data-theme="light" transition:animate="fade">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -99,13 +99,13 @@ const pageTitle = title === SITE.title ? title : `${title} | ${SITE.title}`;
     <!-- Theme Script (inline to prevent flash) -->
     <script is:inline>
       // Initialize theme before render
-      const theme = localStorage.getItem('theme') || 'warm';
-      const mode = localStorage.getItem('mode') || 'auto';
+      const theme = localStorage.getItem('theme-variant') || 'warm';
+      const mode = localStorage.getItem('theme') || 'auto';
       const actualMode = mode === 'auto'
         ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
         : mode;
       document.documentElement.setAttribute('data-theme-variant', theme);
-      document.documentElement.setAttribute('data-mode', actualMode);
+      document.documentElement.setAttribute('data-theme', actualMode);
     </script>
 
     <!-- Analytics -->

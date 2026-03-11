@@ -39,93 +39,48 @@ const {
   (function() {
     function initStepper() {
       const stepperEl = document.getElementById(stepperId);
+      if (!stepperEl) return;
+      if (stepperEl.classList.contains('stepper-initialized')) return;
 
-
-      console.log('[Stepper] Initializing stepper:', stepperId);
-      console.log('[Stepper] Element found:', !!stepperEl);
-
-
-      if (!stepperEl) {
-        console.error('[Stepper] Element not found:', stepperId);
-        return;
-      }
-
-
-      if (stepperEl.classList.contains('stepper-initialized')) {
-        console.log('[Stepper] Already initialized');
-        return;
-      }
-
-      // Get steps data
-      const stepsData = stepperEl.dataset.steps;
-      console.log('[Stepper] Steps data:', stepsData);
-
-      // Check if Stepper is already loaded
-      if (window.Stepper) {
-        console.log('[Stepper] Using existing Stepper class');
-        try {
-          new window.Stepper(stepperEl, {
-            onStepClick: (step, index) => {
-              console.log('[Stepper] Step clicked:', step);
-              if (step.href) {
-                window.location.href = step.href;
-              }
+      function createStepper() {
+        new window.MonochromeEdge.Stepper(stepperEl, {
+          onStepClick: (step) => {
+            if (step.href) {
+              window.location.href = step.href;
             }
-          });
-          stepperEl.classList.add('stepper-initialized');
-          console.log('[Stepper] Initialized successfully');
-        } catch (error) {
-          console.error('[Stepper] Initialization error:', error);
-        }
+          }
+        });
+        stepperEl.classList.add('stepper-initialized');
+      }
+
+      if (window.MonochromeEdge && window.MonochromeEdge.Stepper) {
+        createStepper();
         return;
       }
 
-      // Try multiple local vendor directory pathslocal vendor
-      const cdnPaths = [
+      // Try loading from local vendor, then CDN fallbacks
+      const paths = [
         `${basePath}vendor/stepper/stepper.js`,
         'https://cdn.jsdelivr.net/npm/@monochrome-edge/ui@latest/components/stepper/stepper.js',
         'https://cdn.jsdelivr.net/npm/@monochrome-edge/ui/dist/components/stepper/stepper.js'
       ];
 
-      let currentPathIndex = 0;
+      let pathIndex = 0;
 
       function tryLoadScript() {
-        if (currentPathIndex >= cdnPaths.length) {
-          console.error('[Stepper] All CDN paths failed');
-          return;
- successfully        }
-
-        const scriptPath = cdnPaths[currentPathIndex];
-        console.log('[Stepper] Trying CDN path:', scriptPath);
+        if (pathIndex >= paths.length) return;
 
         const script = document.createElement('script');
-        script.src = scriptPath;
+        script.src = paths[pathIndex];
 
         script.onerror = () => {
-          console.error('[Stepper] Failed to load from:', scriptPath);
-          currentPathIndex++;
+          pathIndex++;
           tryLoadScript();
         };
 
         script.onload = () => {
-          console.log('[Stepper] Script loaded from:', scriptPath);
-          if (window.Stepper) {
-            try {
-              new window.Stepper(stepperEl, {
-                onStepClick: (step, index) => {
-                  console.log('[Stepper] Step clicked:', step);
-                  if (step.href) {
-                    window.location.href = step.href;
-                  }
-                }
-              });
-              stepperEl.classList.add('stepper-initialized');
-              console.log('[Stepper] Initialized successfully');
-            } catch (error) {
-              console.error('[Stepper] Initialization error:', error);
-            }
-          } else {
-            console.error('[Stepper] Stepper class not found after script load');
+          if (window.MonochromeEdge && window.MonochromeEdge.Stepper) {
+            createStepper();
           }
         };
 
@@ -135,14 +90,12 @@ const {
       tryLoadScript();
     }
 
-    // Initialize on page load
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initStepper);
     } else {
       initStepper();
     }
 
-    // Reinitialize after page navigation (for view transitions)
     document.addEventListener('astro:after-swap', initStepper);
   })();
 </script>

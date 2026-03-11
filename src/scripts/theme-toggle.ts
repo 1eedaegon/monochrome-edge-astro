@@ -1,8 +1,8 @@
 type Theme = 'warm' | 'cold';
 type Mode = 'light' | 'dark' | 'auto';
 
-const THEME_KEY = 'theme';
-const MODE_KEY = 'mode';
+const THEME_KEY = 'theme-variant';
+const MODE_KEY = 'theme';
 
 /**
  * Get system preference for dark mode
@@ -36,7 +36,7 @@ function getMode(): Mode {
 function applyTheme(theme: Theme, mode: Mode) {
   const actualMode = mode === 'auto' ? getSystemPreference() : mode;
   document.documentElement.setAttribute('data-theme-variant', theme);
-  document.documentElement.setAttribute('data-mode', actualMode);
+  document.documentElement.setAttribute('data-theme', actualMode);
 }
 
 /**

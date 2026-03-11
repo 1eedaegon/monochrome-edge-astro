@@ -319,13 +319,13 @@ const isActive = (href: string) => {
     const modeToggle = document.getElementById('mode-toggle');
     if (modeToggle) {
       // Set initial state
-      const currentMode = document.documentElement.getAttribute('data-mode') || 'light';
+      const currentMode = document.documentElement.getAttribute('data-theme') || 'light';
       updateToggleState(modeToggle as HTMLElement, currentMode);
 
       modeToggle.addEventListener('click', () => {
         if (typeof (window as any).toggleMode === 'function') {
           (window as any).toggleMode();
-          const newMode = document.documentElement.getAttribute('data-mode') || 'light';
+          const newMode = document.documentElement.getAttribute('data-theme') || 'light';
           updateToggleState(modeToggle as HTMLElement, newMode);
         }
       });
