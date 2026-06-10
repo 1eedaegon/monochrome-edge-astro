@@ -5,7 +5,7 @@ interface Step {
   labelDesc: string;
   title: string;
   desc: string;
-  state: 'pending' | 'active' | 'completed';
+  state: 'pending' | 'active' | 'completed' | 'failed' | 'error';
   href: string;
 }
 
@@ -24,78 +24,60 @@ const {
 } = Astro.props;
 ---
 
-<link rel="stylesheet" href={`${import.meta.env.BASE_URL}vendor/stepper/stepper-unified.css`} />
-
 <div
   class="stepper"
   id={id}
+  data-series-stepper
   data-type={type}
   data-layout={layout}
   data-steps={JSON.stringify(steps)}
 >
 </div>
 
-<script define:vars={{ stepperId: id, basePath: import.meta.env.BASE_URL }}>
-  (function() {
-    function initStepper() {
-      const stepperEl = document.getElementById(stepperId);
-      if (!stepperEl) return;
-      if (stepperEl.classList.contains('stepper-initialized')) return;
+<script>
+  import { Stepper } from '@monochrome-edge/ui';
 
-      function createStepper() {
-        new window.MonochromeEdge.Stepper(stepperEl, {
+  type StepWithHref = {
+    href?: string;
+  };
+
+  const stepperInstances = new Map<HTMLElement, InstanceType<typeof Stepper>>();
+
+  function initSeriesSteppers() {
+    document.querySelectorAll<HTMLElement>('[data-series-stepper]').forEach((stepperEl) => {
+      if (stepperEl.dataset.stepperInitialized === 'true') return;
+
+      try {
+        const stepper = new Stepper(stepperEl, {
           onStepClick: (step) => {
-            if (step.href) {
-              window.location.href = step.href;
+            const href = (step as StepWithHref).href;
+            if (href) {
+              window.location.href = href;
             }
-          }
+          },
         });
-        stepperEl.classList.add('stepper-initialized');
+        stepperInstances.set(stepperEl, stepper);
+        stepperEl.dataset.stepperInitialized = 'true';
+      } catch {
+        stepperEl.dataset.stepperError = 'true';
       }
+    });
+  }
 
-      if (window.MonochromeEdge && window.MonochromeEdge.Stepper) {
-        createStepper();
-        return;
-      }
+  function destroySeriesSteppers() {
+    stepperInstances.forEach((stepper, stepperEl) => {
+      stepper.destroy();
+      delete stepperEl.dataset.stepperInitialized;
+    });
+    stepperInstances.clear();
+  }
 
-      // Try loading from local vendor, then CDN fallbacks
-      const paths = [
-        `${basePath}vendor/stepper/stepper.js`,
-        'https://cdn.jsdelivr.net/npm/@monochrome-edge/ui@latest/components/stepper/stepper.js',
-        'https://cdn.jsdelivr.net/npm/@monochrome-edge/ui/dist/components/stepper/stepper.js'
-      ];
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSeriesSteppers);
+  } else {
+    initSeriesSteppers();
+  }
 
-      let pathIndex = 0;
-
-      function tryLoadScript() {
-        if (pathIndex >= paths.length) return;
-
-        const script = document.createElement('script');
-        script.src = paths[pathIndex];
-
-        script.onerror = () => {
-          pathIndex++;
-          tryLoadScript();
-        };
-
-        script.onload = () => {
-          if (window.MonochromeEdge && window.MonochromeEdge.Stepper) {
-            createStepper();
-          }
-        };
-
-        document.head.appendChild(script);
-      }
-
-      tryLoadScript();
-    }
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initStepper);
-    } else {
-      initStepper();
-    }
-
-    document.addEventListener('astro:after-swap', initStepper);
-  })();
+  document.addEventListener('astro:before-swap', destroySeriesSteppers);
+  document.addEventListener('astro:after-swap', initSeriesSteppers);
 </script>

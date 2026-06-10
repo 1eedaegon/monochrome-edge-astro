@@ -13,7 +13,7 @@ export const SITE = {
   url: getEnv("SITE_URL", "https://yourusername.github.io"),
   author: getEnv("SITE_AUTHOR", "Your Name"),
   locale: "ko-KR",
-  defaultTheme: getEnv("DEFAULT_THEME", "warm") as "warm" | "cold",
+  defaultTheme: getEnv("DEFAULT_THEME", "cold") as "warm" | "cold",
   defaultMode: getEnv("DEFAULT_MODE", "auto") as "light" | "dark" | "auto",
 };
 

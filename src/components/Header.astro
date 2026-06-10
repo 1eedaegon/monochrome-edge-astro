@@ -41,7 +41,7 @@ const isActive = (href: string) => {
         <button
           id="theme-toggle"
           class="icon-btn-toggle icon-btn-toggle-ghost icon-btn-toggle-theme"
-          data-state="warm"
+          data-state="cold"
           aria-label="Toggle theme"
           title="Toggle theme (Warm/Cold)"
         >
@@ -276,15 +276,17 @@ const isActive = (href: string) => {
 <script>
   // Mobile menu toggle
   function initMobileMenu() {
-    const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+    const mobileMenuToggle = document.getElementById('mobile-menu-toggle') as HTMLElement | null;
     const mobileMenu = document.getElementById('mobile-menu');
 
-    if (mobileMenuToggle && mobileMenu) {
-      mobileMenuToggle.addEventListener('click', () => {
-        const isOpen = mobileMenu.classList.toggle('open');
-        mobileMenuToggle.setAttribute('aria-expanded', isOpen.toString());
-      });
-    }
+    if (!mobileMenuToggle || !mobileMenu) return;
+    if (mobileMenuToggle.dataset.initialized === 'true') return;
+    mobileMenuToggle.dataset.initialized = 'true';
+
+    mobileMenuToggle.addEventListener('click', () => {
+      const isOpen = mobileMenu.classList.toggle('open');
+      mobileMenuToggle.setAttribute('aria-expanded', isOpen.toString());
+    });
   }
 
   // Update toggle button state
@@ -298,38 +300,42 @@ const isActive = (href: string) => {
 
   // Theme toggle
   function initThemeToggle() {
-    const themeToggle = document.getElementById('theme-toggle');
-    if (themeToggle) {
-      // Set initial state
-      const currentTheme = document.documentElement.getAttribute('data-theme-variant') || 'warm';
-      updateToggleState(themeToggle as HTMLElement, currentTheme);
+    const themeToggle = document.getElementById('theme-toggle') as HTMLElement | null;
+    if (!themeToggle) return;
 
-      themeToggle.addEventListener('click', () => {
-        if (typeof (window as any).toggleTheme === 'function') {
-          (window as any).toggleTheme();
-          const newTheme = document.documentElement.getAttribute('data-theme-variant') || 'warm';
-          updateToggleState(themeToggle as HTMLElement, newTheme);
-        }
-      });
-    }
+    const currentTheme = document.documentElement.getAttribute('data-theme-variant') || 'cold';
+    updateToggleState(themeToggle, currentTheme);
+
+    if (themeToggle.dataset.initialized === 'true') return;
+    themeToggle.dataset.initialized = 'true';
+
+    themeToggle.addEventListener('click', () => {
+      if (typeof (window as any).toggleTheme === 'function') {
+        (window as any).toggleTheme();
+        const newTheme = document.documentElement.getAttribute('data-theme-variant') || 'cold';
+        updateToggleState(themeToggle, newTheme);
+      }
+    });
   }
 
   // Mode toggle
   function initModeToggle() {
-    const modeToggle = document.getElementById('mode-toggle');
-    if (modeToggle) {
-      // Set initial state
-      const currentMode = document.documentElement.getAttribute('data-theme') || 'light';
-      updateToggleState(modeToggle as HTMLElement, currentMode);
+    const modeToggle = document.getElementById('mode-toggle') as HTMLElement | null;
+    if (!modeToggle) return;
 
-      modeToggle.addEventListener('click', () => {
-        if (typeof (window as any).toggleMode === 'function') {
-          (window as any).toggleMode();
-          const newMode = document.documentElement.getAttribute('data-theme') || 'light';
-          updateToggleState(modeToggle as HTMLElement, newMode);
-        }
-      });
-    }
+    const currentMode = document.documentElement.getAttribute('data-theme') || 'light';
+    updateToggleState(modeToggle, currentMode);
+
+    if (modeToggle.dataset.initialized === 'true') return;
+    modeToggle.dataset.initialized = 'true';
+
+    modeToggle.addEventListener('click', () => {
+      if (typeof (window as any).toggleMode === 'function') {
+        (window as any).toggleMode();
+        const newMode = document.documentElement.getAttribute('data-theme') || 'light';
+        updateToggleState(modeToggle, newMode);
+      }
+    });
   }
 
   // Initialize all

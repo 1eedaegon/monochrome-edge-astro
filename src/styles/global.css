@@ -35,151 +35,47 @@ body {
 }
 
 /* ============================================
-   Warm Theme Tokens
+   Design System Compatibility Layer
+   @monochrome-edge/ui owns the core --theme-* tokens.
+   These aliases keep existing blog components on that token source.
    ============================================ */
+:root {
+    --bg-primary: var(--theme-bg);
+    --bg-secondary: var(--theme-surface);
+    --bg-tertiary: color-mix(
+        in srgb,
+        var(--theme-surface) 88%,
+        var(--theme-text-secondary) 12%
+    );
+    --text-primary: var(--theme-text-primary);
+    --text-secondary: var(--theme-text-secondary);
+    --text-tertiary: var(--theme-text-tertiary);
+    --accent-primary: var(--theme-accent);
+    --accent-secondary: var(--theme-highlight);
+    --bg-hover: var(--bg-tertiary);
+    --border: var(--theme-border);
+    --border-primary: var(--theme-border);
+    --border-secondary: color-mix(
+        in srgb,
+        var(--theme-border) 80%,
+        var(--theme-text-secondary) 20%
+    );
+}
+
 [data-theme-variant="warm"] {
-    --font-family-sans:
-        "Pretendard", "Noto Sans KR", -apple-system, BlinkMacSystemFont,
-        "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    --font-family-mono:
-        "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
-    --font-size-h1: 28px;
-    --font-weight-h1: 700;
-    --font-size-body: 16px;
-    --font-weight-body: 400;
-    --font-size-caption: 14px;
-    --border-radius: 8px;
-    --transition-speed: 0.2s ease-in-out;
-
-    /* Warm Gray Scale */
-    --warm-100: #f8f7f6;
-    --warm-200: #edebe9;
-    --warm-300: #dcd9d6;
-    --warm-400: #b8b4b0;
-    --warm-500: #94908c;
-    --warm-600: #706c68;
-    --warm-700: #4c4844;
-    --warm-800: #302d2a;
-    --warm-900: #1c1a18;
-
-    /* Semantic Colors */
-    --color-success: #7b9f60;
-    --color-warning: #d4a574;
-    --color-error: #8b3a3a;
-    --color-info: #6b7280;
-
-    /* Light Theme */
-    --theme-bg: #f7f6f5;
-    --theme-background: #f7f6f5;
-    --theme-text-primary: #1c1a18;
-    --theme-text-secondary: #5c5956;
-    --theme-text-tertiary: #94908c;
-    --theme-accent: #8a8784;
-    --theme-accent-contrast: #fff;
-    --theme-secondary: #a8a5a2;
-    --theme-secondary-contrast: #fff;
-    --theme-border: #e5e3e1;
-    --theme-surface: #fff;
-    --theme-highlight: #7a6a6a;
-    --theme-shadow-color: rgba(28, 26, 24, 0.12);
-    --theme-shadow-sm: 0 1px 3px var(--theme-shadow-color);
-    --theme-shadow-md: 0 4px 12px var(--theme-shadow-color);
-    --theme-shadow-lg: 0 8px 24px var(--theme-shadow-color);
-    --theme-shadow-xl: 0 10px 40px var(--theme-shadow-color);
+    --theme-text-tertiary: var(--warm-500);
 }
 
 [data-theme-variant="warm"][data-theme="dark"] {
-    --theme-bg: #1b1a19;
-    --theme-background: #1b1a19;
-    --theme-text-primary: rgba(255, 255, 255, 0.92);
-    --theme-text-secondary: #a8a5a2;
-    --theme-text-tertiary: #706c68;
-    --theme-accent: #4a4846;
-    --theme-accent-contrast: rgba(255, 255, 255, 0.92);
-    --theme-secondary: #5c5956;
-    --theme-secondary-contrast: rgba(255, 255, 255, 0.92);
-    --theme-border: #323130;
-    --theme-surface: #232221;
-    --theme-highlight: #6b6866;
-    --theme-shadow-color: rgba(0, 0, 0, 0.35);
-    --theme-shadow-sm: 0 1px 3px var(--theme-shadow-color);
-    --theme-shadow-md: 0 4px 12px var(--theme-shadow-color);
-    --theme-shadow-lg: 0 8px 24px var(--theme-shadow-color);
-    --theme-shadow-xl: 0 10px 40px var(--theme-shadow-color);
+    --theme-text-tertiary: var(--warm-600);
 }
 
-/* ============================================
-   Cold Theme Tokens
-   ============================================ */
 [data-theme-variant="cold"] {
-    --font-family-sans:
-        "Pretendard", "Noto Sans KR", -apple-system, BlinkMacSystemFont,
-        "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    --font-family-mono:
-        "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
-    --font-size-h1: 24px;
-    --font-weight-h1: 600;
-    --font-size-body: 15px;
-    --font-weight-body: 400;
-    --font-size-caption: 12px;
-    --border-radius: 6px;
-    --transition-speed: 0.15s ease-in-out;
-
-    /* Cool Gray Scale */
-    --cool-100: #f7f8f9;
-    --cool-200: #e5e7eb;
-    --cool-300: #d1d5db;
-    --cool-400: #9ca3af;
-    --cool-500: #6b7280;
-    --cool-600: #4b5563;
-    --cool-700: #374151;
-    --cool-800: #1f2937;
-    --cool-900: #111827;
-
-    /* Semantic Colors */
-    --color-success: #7b9f60;
-    --color-warning: #d4a574;
-    --color-error: #8b3a3a;
-    --color-info: #6b7280;
-
-    /* Light Theme */
-    --theme-bg: #f5f7f9;
-    --theme-background: #f5f7f9;
-    --theme-text-primary: #18181b;
-    --theme-text-secondary: #71717a;
-    --theme-text-tertiary: #9ca3af;
-    --theme-accent: #6b7280;
-    --theme-accent-contrast: #fff;
-    --theme-secondary: #9ca3af;
-    --theme-secondary-contrast: #fff;
-    --theme-border: #e4e4e7;
-    --theme-surface: #fff;
-    --theme-highlight: #475569;
-    --theme-shadow-color: rgba(24, 24, 27, 0.08);
-    --theme-shadow-sm: 0 1px 3px var(--theme-shadow-color);
-    --theme-shadow-md: 0 4px 12px var(--theme-shadow-color);
-    --theme-shadow-lg: 0 8px 24px var(--theme-shadow-color);
-    --theme-shadow-xl: 0 10px 40px var(--theme-shadow-color);
+    --theme-text-tertiary: var(--cool-400);
 }
 
 [data-theme-variant="cold"][data-theme="dark"] {
-    --theme-bg: #161a1f;
-    --theme-background: #161a1f;
-    --theme-text-primary: rgba(255, 255, 255, 0.95);
-    --theme-text-secondary: #b1b1ba;
-    --theme-text-tertiary: #6b7280;
-    --theme-accent: #9ca3af;
-    --theme-accent-contrast: #18181b;
-    --theme-secondary: #6b7280;
-    --theme-secondary-contrast: #fff;
-    --theme-border: #3a3a3f;
-    --theme-surface: #1e2329;
-    --theme-highlight: #64748b;
-    --theme-shadow-color: rgba(0, 0, 0, 0.45);
-    --theme-shadow-sm: 0 1px 3px var(--theme-shadow-color);
-    --theme-shadow-md: 0 4px 12px var(--theme-shadow-color);
-    --theme-shadow-lg: 0 8px 24px var(--theme-shadow-color);
-    --theme-shadow-xl: 0 10px 40px var(--theme-shadow-color);
+    --theme-text-tertiary: var(--cool-500);
 }
 
 /* ============================================

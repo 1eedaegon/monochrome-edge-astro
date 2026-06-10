@@ -3,6 +3,7 @@ type Mode = 'light' | 'dark' | 'auto';
 
 const THEME_KEY = 'theme-variant';
 const MODE_KEY = 'theme';
+const DEFAULT_THEME: Theme = 'cold';
 
 /**
  * Get system preference for dark mode
@@ -19,7 +20,7 @@ function getSystemPreference(): 'light' | 'dark' {
  */
 function getTheme(): Theme {
   const stored = localStorage.getItem(THEME_KEY);
-  return (stored === 'warm' || stored === 'cold') ? stored : 'warm';
+  return (stored === 'warm' || stored === 'cold') ? stored : DEFAULT_THEME;
 }
 
 /**
