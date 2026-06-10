@@ -9,7 +9,7 @@ if (!isProd || !config.enabled || !config.measurementId) {
 }
 ---
 
-<script async src={`https://www.googletagmanager.com/gtag/js?id=${config.measurementId}`}></script>
+<script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${config.measurementId}`}></script>
 <script is:inline define:vars={{ gaId: config.measurementId }}>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}

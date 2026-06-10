@@ -15,8 +15,8 @@ const pageIdentifier = Astro.url.pathname;
   <div id="disqus_thread"></div>
 </div>
 
-<script define:vars={{ shortname: config.shortname, pageUrl, pageIdentifier }}>
-  var disqus_config = function () {
+<script is:inline define:vars={{ shortname: config.shortname, pageUrl, pageIdentifier }}>
+  window['disqus_config'] = function () {
     this.page.url = pageUrl;
     this.page.identifier = pageIdentifier;
   };

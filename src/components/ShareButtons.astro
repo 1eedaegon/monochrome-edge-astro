@@ -129,6 +129,9 @@ const encodedUrl = encodeURIComponent(url);
     const shareButtons = document.querySelectorAll('.share-button');
 
     shareButtons.forEach((button) => {
+      if ((button as HTMLElement).dataset.initialized === 'true') return;
+      (button as HTMLElement).dataset.initialized = 'true';
+
       button.addEventListener('click', async (e) => {
         const target = e.currentTarget as HTMLButtonElement;
         const platform = target.dataset.platform;
@@ -153,8 +156,7 @@ const encodedUrl = encodeURIComponent(url);
             setTimeout(() => {
               target.classList.remove('copied');
             }, 2000);
-          } catch (err) {
-            console.error('Failed to copy:', err);
+          } catch {
             if (typeof (window as any).showToast === 'function') {
               (window as any).showToast('Failed to copy link', 'error', 2000);
             }

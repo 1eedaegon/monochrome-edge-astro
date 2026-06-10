@@ -23,6 +23,9 @@ function initExternalLinkTracking() {
           anchor.setAttribute('target', '_blank');
         }
 
+        if (anchor.dataset.externalTrackingInitialized === 'true') return;
+        anchor.dataset.externalTrackingInitialized = 'true';
+
         // Add click tracking
         anchor.addEventListener('click', () => {
           const linkText = anchor.textContent || anchor.getAttribute('aria-label') || href;

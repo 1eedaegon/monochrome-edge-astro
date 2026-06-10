@@ -34,6 +34,8 @@ const currentLang = getLangFromUrl(Astro.url);
   function initLanguageSwitcher() {
     const langBtn = document.getElementById('lang-toggle');
     if (!langBtn) return;
+    if (langBtn.dataset.initialized === 'true') return;
+    langBtn.dataset.initialized = 'true';
 
     // Simple toggle between KO and EN
     langBtn.addEventListener('click', () => {
@@ -52,9 +54,6 @@ const currentLang = getLangFromUrl(Astro.url);
 
       // Update document lang attribute
       document.documentElement.setAttribute('lang', newLang);
-
-      // TODO: Implement actual language switching when multi-language routing is added
-      console.log(`Language switched to: ${newLang}`);
     });
 
     // Load preferred language on page load

@@ -9,4 +9,4 @@ if (!isProd || !config.enabled || !config.domain) {
 }
 ---
 
-<script defer data-domain={config.domain} src={config.src}></script>
+<script is:inline defer data-domain={config.domain} src={config.src}></script>

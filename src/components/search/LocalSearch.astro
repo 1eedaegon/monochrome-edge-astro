@@ -2,9 +2,17 @@
 // Search Modal Component
 ---
 
-<div id="search-modal" class="search-modal">
+<div
+  id="search-modal"
+  class="search-modal"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="search-modal-title"
+  aria-hidden="true"
+>
   <div class="search-modal-backdrop"></div>
   <div class="search-modal-content">
+    <h2 id="search-modal-title" class="sr-only">Search articles</h2>
     <div class="search-header">
       <input
         type="text"
@@ -12,12 +20,14 @@
         class="search-input"
         placeholder="Search articles..."
         autocomplete="off"
+        aria-label="Search articles"
+        aria-controls="search-results"
       />
       <button id="search-close" class="search-close" aria-label="Close search">
         <span>✕</span>
       </button>
     </div>
-    <div id="search-results" class="search-results">
+    <div id="search-results" class="search-results" role="listbox" aria-live="polite">
       <div class="search-hint">
         <p>Type to search articles by title, description, tags, or content...</p>
         <p class="search-hint-keys">
@@ -44,6 +54,18 @@
 
   .search-modal.open {
     display: flex;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   .search-modal-backdrop {
@@ -225,40 +247,54 @@
 
 <script>
   import Fuse from 'fuse.js';
+  import {
+    isSearchIndexItem,
+    normalizeSearchIndexItem,
+    SEARCH_CONFIG,
+    type SearchIndexItem,
+  } from '../../utils/search';
 
-  interface SearchItem {
-    id: string;
-    title: string;
-    description?: string;
-    tags: string[];
-    content: string;
-    url: string;
-  }
-
-  let searchIndex: SearchItem[] = [];
-  let fuse: Fuse<SearchItem> | null = null;
+  let searchIndex: SearchIndexItem[] = [];
+  let fuse: Fuse<SearchIndexItem> | null = null;
   let selectedIndex = -1;
   let searchResults: HTMLElement[] = [];
+  let isGlobalShortcutBound = false;
+
+  function renderSearchUnavailable() {
+    const resultsContainer = document.getElementById('search-results');
+    if (!resultsContainer) return;
+
+    resultsContainer.innerHTML = `
+      <div class="search-no-results">
+        <p>Search is temporarily unavailable.</p>
+      </div>
+    `;
+  }
 
   // Load search index
   async function loadSearchIndex() {
     try {
       const response = await fetch(`${import.meta.env.BASE_URL}search-index.json`);
-      searchIndex = await response.json();
+      if (!response.ok) {
+        throw new Error(`Search index request failed with ${response.status}`);
+      }
+
+      const rawSearchIndex = await response.json();
+      searchIndex = Array.isArray(rawSearchIndex)
+        ? rawSearchIndex
+            .filter(isSearchIndexItem)
+            .map((item) => normalizeSearchIndexItem(item, window.location.origin, import.meta.env.BASE_URL))
+            .filter((item): item is SearchIndexItem => Boolean(item))
+        : [];
 
       fuse = new Fuse(searchIndex, {
-        keys: [
-          { name: 'title', weight: 2 },
-          { name: 'description', weight: 1.5 },
-          { name: 'tags', weight: 1.2 },
-          { name: 'content', weight: 1 }
-        ],
-        threshold: 0.3,
+        ...SEARCH_CONFIG,
         includeMatches: true,
-        minMatchCharLength: 2
       });
-    } catch (_error) {
-      // Search index loading failed silently
+    } catch {
+      searchIndex = [];
+      fuse = null;
+      renderSearchUnavailable();
     }
   }
 
@@ -291,7 +327,8 @@
 
   // Perform search
   function performSearch(query: string) {
-    const resultsContainer = document.getElementById('search-results')!;
+    const resultsContainer = document.getElementById('search-results');
+    if (!resultsContainer) return;
 
     if (!query.trim() || !fuse) {
       resultsContainer.innerHTML = `
@@ -331,7 +368,7 @@
         : '';
 
       return `
-        <a href="${escapeHtml(item.url)}" class="search-result-item" data-index="${index}">
+        <a href="${escapeHtml(item.url)}" class="search-result-item" data-index="${index}" role="option">
           <div class="search-result-title">${highlightedTitle}</div>
           ${highlightedDesc ? `<div class="search-result-description">${highlightedDesc}</div>` : ''}
           ${item.tags.length > 0 ? `
@@ -379,10 +416,12 @@
 
   // Open modal
   export function openSearchModal() {
-    const modal = document.getElementById('search-modal')!;
+    const modal = document.getElementById('search-modal');
     const input = document.getElementById('search-input') as HTMLInputElement;
+    if (!modal || !input) return;
 
     modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
     input.focus();
     input.value = '';
     performSearch('');
@@ -393,21 +432,28 @@
 
   // Close modal
   export function closeSearchModal() {
-    const modal = document.getElementById('search-modal')!;
+    const modal = document.getElementById('search-modal');
+    if (!modal) return;
+
     modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
 
     // Restore body scroll
     document.body.style.overflow = '';
   }
 
   // Initialize
-  document.addEventListener('DOMContentLoaded', () => {
+  function initSearchModal() {
+    const modal = document.getElementById('search-modal');
+    if (!modal || modal.dataset.initialized === 'true') return;
+
+    modal.dataset.initialized = 'true';
     loadSearchIndex();
 
-    const modal = document.getElementById('search-modal')!;
     const input = document.getElementById('search-input') as HTMLInputElement;
-    const closeBtn = document.getElementById('search-close')!;
-    const backdrop = modal.querySelector('.search-modal-backdrop')!;
+    const closeBtn = document.getElementById('search-close');
+    const backdrop = modal.querySelector('.search-modal-backdrop');
+    if (!input || !closeBtn || !backdrop) return;
 
     // Search input
     input.addEventListener('input', (e) => {
@@ -435,13 +481,24 @@
     backdrop.addEventListener('click', closeSearchModal);
 
     // Global keyboard shortcut
-    document.addEventListener('keydown', (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-        e.preventDefault();
-        openSearchModal();
-      }
-    });
-  });
+    if (!isGlobalShortcutBound) {
+      document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+          e.preventDefault();
+          openSearchModal();
+        }
+      });
+      isGlobalShortcutBound = true;
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSearchModal);
+  } else {
+    initSearchModal();
+  }
+
+  document.addEventListener('astro:after-swap', initSearchModal);
 
   // Make functions globally available
   (window as any).openSearchModal = openSearchModal;
