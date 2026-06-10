@@ -6,6 +6,7 @@ import Footer from '../../components/Footer.astro';
 import ArticleCard from '../../components/ArticleCard.astro';
 import { resolvePostDates } from '../../utils/git-dates';
 import { calculateReadingTime } from '../../utils/reading-time';
+import { articleIdToSlug, articlesPath } from '../../utils/url';
 
 export async function getStaticPaths() {
   const categories = await getAllCategories();
@@ -55,7 +56,7 @@ const { category, posts, count } = Astro.props;
     <section class="articles-list">
       {posts.map((post) => (
         <ArticleCard
-          id={post.id.replace('.md', '')}
+          id={articleIdToSlug(post.id)}
           title={post.data.title}
           description={post.data.description}
           tags={post.data.tags}
@@ -67,7 +68,7 @@ const { category, posts, count } = Astro.props;
     </section>
 
     <div class="back-link">
-      <a href={`${import.meta.env.BASE_URL}articles`}>Back to all articles</a>
+      <a href={articlesPath(import.meta.env.BASE_URL)}>Back to all articles</a>
     </div>
   </main>
 

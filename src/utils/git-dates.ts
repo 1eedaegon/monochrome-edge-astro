@@ -141,11 +141,11 @@ export function getRelativeTime(date: Date, locale = 'ko-KR'): string {
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const formatter = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
 
-  if (diffDays === 0) return '오늘';
-  if (diffDays === 1) return '어제';
-  if (diffDays < 7) return `${diffDays}일 전`;
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)}주 전`;
-  if (diffDays < 365) return `${Math.floor(diffDays / 30)}개월 전`;
-  return `${Math.floor(diffDays / 365)}년 전`;
+  if (diffDays < 1) return formatter.format(0, 'day');
+  if (diffDays < 7) return formatter.format(-diffDays, 'day');
+  if (diffDays < 30) return formatter.format(-Math.floor(diffDays / 7), 'week');
+  if (diffDays < 365) return formatter.format(-Math.floor(diffDays / 30), 'month');
+  return formatter.format(-Math.floor(diffDays / 365), 'year');
 }

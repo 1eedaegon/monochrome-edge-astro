@@ -1,4 +1,5 @@
 import type { CollectionEntry } from "astro:content";
+import { articleIdToSlug, articlePath, sameOriginPath } from "./url";
 
 export interface SearchIndexItem {
   id: string;
@@ -15,10 +16,9 @@ export interface SearchIndexItem {
  */
 export function generateSearchIndex(
   posts: CollectionEntry<"articles">[],
-  baseUrl: string
+  basePath: string
 ): SearchIndexItem[] {
   return posts
-    .filter((post) => !post.data.draft)
     .map((post) => {
       // Extract first 500 chars of content for search
       const plainContent = post.body
@@ -30,15 +30,40 @@ export function generateSearchIndex(
         : "";
 
       return {
-        id: post.id.replace(".md", ""),
+        id: articleIdToSlug(post.id),
         title: post.data.title,
         description: post.data.description || "",
         tags: post.data.tags,
         content: plainContent,
         date: post.data.date?.toISOString() || "",
-        url: `${baseUrl}/articles/${post.id.replace(".md", "")}`,
+        url: articlePath(basePath, post.id),
       };
     });
+}
+
+export function isSearchIndexItem(item: unknown): item is SearchIndexItem {
+  if (!item || typeof item !== "object") return false;
+
+  const candidate = item as SearchIndexItem;
+  return (
+    typeof candidate.id === "string" &&
+    typeof candidate.title === "string" &&
+    typeof candidate.description === "string" &&
+    Array.isArray(candidate.tags) &&
+    candidate.tags.every((tag) => typeof tag === "string") &&
+    typeof candidate.content === "string" &&
+    typeof candidate.date === "string" &&
+    typeof candidate.url === "string"
+  );
+}
+
+export function normalizeSearchIndexItem(
+  item: SearchIndexItem,
+  origin: string,
+  basePath: string,
+): SearchIndexItem | null {
+  const url = sameOriginPath(item.url, origin, basePath);
+  return url ? { ...item, url } : null;
 }
 
 /**

@@ -248,8 +248,6 @@ const allTags = [...new Set(sortedPosts.flatMap(post => post.data.tags))].sort()
   const resultsCount = document.getElementById('results-count');
   const sortSelect = document.getElementById('sort-select') as HTMLSelectElement;
 
-  let currentTag = 'all';
-
   function updateResultsCount() {
     const visible = Array.from(articleWrappers).filter(w => !w.classList.contains('hidden'));
     if (resultsCount) {
@@ -258,8 +256,6 @@ const allTags = [...new Set(sortedPosts.flatMap(post => post.data.tags))].sort()
   }
 
   function filterArticles(tag: string) {
-    currentTag = tag;
-
     articleWrappers.forEach((wrapper) => {
       const articleTags = JSON.parse(wrapper.getAttribute('data-tags') || '[]');
 

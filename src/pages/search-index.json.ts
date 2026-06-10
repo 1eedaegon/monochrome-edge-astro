@@ -1,5 +1,6 @@
 import { getCollection } from 'astro:content';
 import type { APIRoute } from 'astro';
+import { generateSearchIndex } from '../utils/search';
 
 export const GET: APIRoute = async () => {
   const articles = await getCollection('articles', ({ data }) => {
@@ -7,14 +8,7 @@ export const GET: APIRoute = async () => {
     return import.meta.env.PROD ? !data.draft : true;
   });
 
-  const searchData = articles.map((article) => ({
-    id: article.id.replace('.md', ''),
-    title: article.data.title,
-    description: article.data.description || '',
-    tags: article.data.tags || [],
-    content: (article.body || '').substring(0, 500), // First 500 chars
-    url: `${import.meta.env.BASE_URL}articles/${article.id.replace('.md', '')}`,
-  }));
+  const searchData = generateSearchIndex(articles, import.meta.env.BASE_URL);
 
   return new Response(JSON.stringify(searchData), {
     status: 200,

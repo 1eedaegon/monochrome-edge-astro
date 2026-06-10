@@ -1,4 +1,5 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
+import { slugifySegment } from './url';
 
 /**
  * Get all posts in a category
@@ -40,7 +41,7 @@ export async function getAllCategories(): Promise<CategoryWithCount[]> {
     .map(([name, count]) => ({
       name,
       count,
-      slug: name.toLowerCase().replace(/\s+/g, '-'),
+      slug: slugifySegment(name),
     }))
     .sort((a, b) => a.name.localeCompare(b.name));
 }
