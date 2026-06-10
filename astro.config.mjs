@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from "astro/config";
+import { unified } from "@astrojs/markdown-remark";
 import sitemap from "@astrojs/sitemap";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
@@ -20,27 +21,23 @@ export default defineConfig({
       defaultColor: false,
       wrap: true,
     },
-    rehypePlugins: [
-      rehypeSlug,
-      [
-        rehypeAutolinkHeadings,
-        {
-          behavior: "wrap",
-          properties: {
-            className: ["heading-link"],
+    processor: unified({
+      rehypePlugins: [
+        rehypeSlug,
+        [
+          rehypeAutolinkHeadings,
+          {
+            behavior: "wrap",
+            properties: {
+              className: ["heading-link"],
+            },
           },
-        },
+        ],
+        rehypeNoTranslate,
       ],
-      rehypeNoTranslate, // Automatically add translate="no" to code blocks
-    ],
+    }),
   },
   vite: {
-    resolve: {
-      alias: {
-        "@monochrome-edge/ui/stepper":
-          "@monochrome-edge/ui/dist/ui/components/stepper/stepper-unified.js",
-      },
-    },
     optimizeDeps: {
       exclude: ["@monochrome-edge/ui"],
     },
