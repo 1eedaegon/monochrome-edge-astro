@@ -35,6 +35,43 @@ test.describe('Article Page', () => {
     }
   })
 
+  test('code blocks keep Shiki colors and stable wrappers', async ({ page }) => {
+    await page.goto('/articles/welcome-to-monochrome-edge/')
+
+    const codeBlock = page.locator('.code-block-wrapper').first()
+    const pre = codeBlock.locator('pre.astro-code').first()
+    const firstToken = pre.locator('span[style*="--shiki"]').first()
+
+    await expect(pre).toBeVisible()
+    await expect(codeBlock.locator('.copy-button')).toHaveCount(1)
+    await expect(codeBlock.locator('.language-label')).toHaveText(/Markdown/i)
+
+    const lightStyles = await pre.evaluate((element) => ({
+      background: getComputedStyle(element).backgroundColor,
+      color: getComputedStyle(element).color,
+    }))
+    const lightTokenColor = await firstToken.evaluate((element) => getComputedStyle(element).color)
+
+    await page.locator('#mode-toggle').click()
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
+
+    await expect
+      .poll(() => pre.evaluate((element) => getComputedStyle(element).backgroundColor))
+      .not.toBe(lightStyles.background)
+
+    const darkTokenColor = await firstToken.evaluate((element) => getComputedStyle(element).color)
+    expect(darkTokenColor).not.toBe(lightTokenColor)
+
+    await page.evaluate(() => {
+      document.dispatchEvent(new Event('astro:after-swap'))
+      document.dispatchEvent(new Event('astro:after-swap'))
+    })
+
+    await expect(page.locator('.code-block-wrapper .code-block-wrapper')).toHaveCount(0)
+    await expect(codeBlock.locator('.copy-button')).toHaveCount(1)
+    await expect(codeBlock.locator('.language-label')).toHaveCount(1)
+  })
+
   test('tags link correctly', async ({ page }) => {
     const tagLink = page.locator('.article-tags a').first()
     const hasTag = await tagLink.isVisible({ timeout: 3000 }).catch(() => false)

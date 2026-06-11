@@ -7,16 +7,21 @@ function addCopyButtons() {
   const codeBlocks = document.querySelectorAll("pre");
 
   codeBlocks.forEach((pre) => {
-    // Skip if button already exists
-    if (pre.querySelector(".copy-button")) return;
+    if (pre.dataset.copyButtonInitialized === "true") return;
 
-    // Create wrapper
-    const wrapper = document.createElement("div");
-    wrapper.className = "code-block-wrapper";
+    const existingWrapper = pre.parentElement?.classList.contains(
+      "code-block-wrapper",
+    )
+      ? pre.parentElement
+      : null;
 
-    // Wrap the pre element
-    pre.parentNode?.insertBefore(wrapper, pre);
-    wrapper.appendChild(pre);
+    const wrapper = existingWrapper ?? document.createElement("div");
+    wrapper.classList.add("code-block-wrapper");
+
+    if (!existingWrapper) {
+      pre.parentNode?.insertBefore(wrapper, pre);
+      wrapper.appendChild(pre);
+    }
 
     // Create copy button
     const button = document.createElement("button");
@@ -32,43 +37,45 @@ function addCopyButtons() {
       </svg>
     `;
 
-    // Add click handler
-    button.addEventListener("click", async () => {
-      const code =
-        pre.querySelector("code")?.textContent || pre.textContent || "";
+    if (!wrapper.querySelector(".copy-button")) {
+      button.addEventListener("click", async () => {
+        const code =
+          pre.querySelector("code")?.textContent || pre.textContent || "";
 
-      // Extract language from class for analytics
-      const codeElement = pre.querySelector("code");
-      const languageClass = codeElement?.className.match(/language-(\w+)/);
-      const language = languageClass ? languageClass[1] : undefined;
+        const codeElement = pre.querySelector("code");
+        const languageClass = codeElement?.className.match(/language-(\w+)/);
+        const language =
+          pre.dataset.language ||
+          (languageClass ? languageClass[1] : undefined);
 
-      try {
-        await navigator.clipboard.writeText(code);
-        button.classList.add("copied");
+        try {
+          await navigator.clipboard.writeText(code);
+          button.classList.add("copied");
 
-        // Track analytics event
-        trackCodeCopy(language);
+          trackCodeCopy(language);
 
-        // Show toast notification
-        if (typeof (window as any).showToast === "function") {
-          (window as any).showToast(
-            "Code copied to clipboard!",
-            "success",
-            2000,
-          );
+          if (typeof (window as any).showToast === "function") {
+            (window as any).showToast(
+              "Code copied to clipboard!",
+              "success",
+              2000,
+            );
+          }
+
+          setTimeout(() => {
+            button.classList.remove("copied");
+          }, 2000);
+        } catch (_err) {
+          if (typeof (window as any).showToast === "function") {
+            (window as any).showToast("Failed to copy code", "error", 2000);
+          }
         }
+      });
 
-        setTimeout(() => {
-          button.classList.remove("copied");
-        }, 2000);
-      } catch (_err) {
-        if (typeof (window as any).showToast === "function") {
-          (window as any).showToast("Failed to copy code", "error", 2000);
-        }
-      }
-    });
+      wrapper.appendChild(button);
+    }
 
-    wrapper.appendChild(button);
+    pre.dataset.copyButtonInitialized = "true";
   });
 }
 

@@ -3,19 +3,23 @@
  */
 
 function addLanguageLabels() {
-  const codeBlocks = document.querySelectorAll('pre[class*="language-"], pre code[class*="language-"]');
+  const codeBlocks = document.querySelectorAll('pre[data-language], pre[class*="language-"], pre code[class*="language-"]');
 
   codeBlocks.forEach((block) => {
-    const pre = block.tagName === 'PRE' ? block : block.parentElement;
-    if (!pre || pre.querySelector('.language-label')) return;
+    const pre = (block.tagName === 'PRE' ? block : block.parentElement) as HTMLElement | null;
+    if (!pre) return;
+
+    const wrapper = pre.parentElement;
+    if (wrapper?.querySelector('.language-label') || pre.querySelector('.language-label')) return;
 
     // Extract language from class
     const classList = block.className.split(' ');
     const languageClass = classList.find(cls => cls.startsWith('language-'));
 
-    if (!languageClass) return;
+    const rawLanguage = pre.dataset.language || languageClass?.replace('language-', '');
+    if (!rawLanguage) return;
 
-    const language = languageClass.replace('language-', '');
+    const language = rawLanguage.toLowerCase();
 
     // Language display names
     const languageNames: Record<string, string> = {
@@ -53,7 +57,6 @@ function addLanguageLabels() {
     label.textContent = displayName;
 
     // Insert label
-    const wrapper = pre?.parentElement;
     if (wrapper?.classList.contains('code-block-wrapper')) {
       wrapper.appendChild(label);
     }

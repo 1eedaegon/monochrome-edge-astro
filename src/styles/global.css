@@ -163,6 +163,30 @@ pre code {
     padding: 0;
 }
 
+pre.astro-code {
+    background-color: var(--shiki-light-bg, var(--theme-surface));
+    color: var(--shiki-light, var(--theme-text-primary));
+}
+
+pre.astro-code span {
+    color: var(--shiki-light, inherit);
+    font-style: var(--shiki-light-font-style, normal);
+    font-weight: var(--shiki-light-font-weight, inherit);
+    text-decoration: var(--shiki-light-text-decoration, none);
+}
+
+[data-theme="dark"] pre.astro-code {
+    background-color: var(--shiki-dark-bg, var(--theme-surface));
+    color: var(--shiki-dark, var(--theme-text-primary));
+}
+
+[data-theme="dark"] pre.astro-code span {
+    color: var(--shiki-dark, inherit);
+    font-style: var(--shiki-dark-font-style, normal);
+    font-weight: var(--shiki-dark-font-weight, inherit);
+    text-decoration: var(--shiki-dark-text-decoration, none);
+}
+
 /* Code block with copy button */
 .code-block-wrapper {
     position: relative;
@@ -171,6 +195,8 @@ pre code {
 
 .code-block-wrapper pre {
     margin-bottom: 0;
+    padding-top: 2.75rem;
+    padding-right: 3.5rem;
 }
 
 .copy-button {
