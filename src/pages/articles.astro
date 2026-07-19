@@ -39,7 +39,7 @@ const allTags = [...new Set(sortedPosts.flatMap(post => post.data.tags))].sort()
 <BaseLayout title="All Articles">
   <Header />
 
-  <main class="container-narrow">
+  <main id="main-content" class="container-narrow">
     <section class="articles-header">
       <h1>All Articles</h1>
       <div class="articles-toolbar">
@@ -94,6 +94,7 @@ const allTags = [...new Set(sortedPosts.flatMap(post => post.data.tags))].sort()
             date={post.dateInfo.date}
             updated={post.dateInfo.updated}
             readingTime={post.readingTime}
+            featured={post.data.featured}
           />
         </div>
       ))}

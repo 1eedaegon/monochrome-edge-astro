@@ -21,17 +21,39 @@ npm run dev
 
 ### 2. Configure
 
-Copy `.env.example` and edit:
+**Deploying from a template copy? Zero config needed.** The deploy workflow
+automatically uses your GitHub username for the site name, author, and GitHub
+link, and derives `SITE_URL`/`BASE_PATH` from your Pages settings. Just enable
+**Settings → Pages → Source: GitHub Actions** and push.
+
+To customize the deployed site, set **repository variables**
+(Settings → Secrets and variables → Actions → Variables). All are optional:
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `SITE_NAME` / `SITE_TITLE` | repository owner | Site name / browser title |
+| `SITE_AUTHOR` | repository owner | Author metadata, footer |
+| `SITE_DESCRIPTION` | template default | Meta description |
+| `GH_USERNAME` | repository owner | GitHub profile link |
+| `TWITTER_USERNAME` / `EMAIL` | — | Social links |
+| `DEFAULT_THEME` / `DEFAULT_MODE` | `cold` / `auto` | Initial theme |
+| `GA4_ENABLED` + `GA4_MEASUREMENT_ID` | off | Google Analytics |
+| `COMMENTS_PROVIDER` + `GISCUS_*` | off | Comments (giscus) |
+
+> Note: template copies start with a fresh git history, so the demo articles'
+> auto-generated dates become the day you copied the template. Add a `date:`
+> field to frontmatter to pin dates explicitly.
+
+For **local development**, copy `.env.example` and edit:
 
 ```bash
 cp .env.example .env
 ```
 
 ```env
-# Required
 SITE_NAME=Your Name
 SITE_URL=https://yourusername.github.io
-BASE_PATH=/your-repo-name   # GitHub Pages: "/repo-name", Custom domain: "/"
+BASE_PATH=/your-repo-name   # GitHub Pages project site: "/repo-name", user site: "/"
 SITE_AUTHOR=Your Name
 GITHUB_USERNAME=yourusername
 EMAIL=your@example.com

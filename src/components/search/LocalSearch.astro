@@ -246,7 +246,7 @@
 </style>
 
 <script>
-  import Fuse from 'fuse.js';
+  import type Fuse from 'fuse.js';
   import {
     isSearchIndexItem,
     normalizeSearchIndexItem,
@@ -256,6 +256,7 @@
 
   let searchIndex: SearchIndexItem[] = [];
   let fuse: Fuse<SearchIndexItem> | null = null;
+  let searchIndexPromise: Promise<void> | null = null;
   let selectedIndex = -1;
   let searchResults: HTMLElement[] = [];
   let isGlobalShortcutBound = false;
@@ -271,31 +272,41 @@
     `;
   }
 
-  // Load search index
-  async function loadSearchIndex() {
-    try {
-      const response = await fetch(`${import.meta.env.BASE_URL}search-index.json`);
-      if (!response.ok) {
-        throw new Error(`Search index request failed with ${response.status}`);
-      }
+  // Load Fuse.js and the search index lazily on first modal open,
+  // so visitors who never search don't pay for either.
+  function loadSearchIndex(): Promise<void> {
+    if (!searchIndexPromise) {
+      searchIndexPromise = (async () => {
+        try {
+          const [{ default: FuseCtor }, response] = await Promise.all([
+            import('fuse.js'),
+            fetch(`${import.meta.env.BASE_URL}search-index.json`),
+          ]);
+          if (!response.ok) {
+            throw new Error(`Search index request failed with ${response.status}`);
+          }
 
-      const rawSearchIndex = await response.json();
-      searchIndex = Array.isArray(rawSearchIndex)
-        ? rawSearchIndex
-            .filter(isSearchIndexItem)
-            .map((item) => normalizeSearchIndexItem(item, window.location.origin, import.meta.env.BASE_URL))
-            .filter((item): item is SearchIndexItem => Boolean(item))
-        : [];
+          const rawSearchIndex = await response.json();
+          searchIndex = Array.isArray(rawSearchIndex)
+            ? rawSearchIndex
+                .filter(isSearchIndexItem)
+                .map((item) => normalizeSearchIndexItem(item, window.location.origin, import.meta.env.BASE_URL))
+                .filter((item): item is SearchIndexItem => Boolean(item))
+            : [];
 
-      fuse = new Fuse(searchIndex, {
-        ...SEARCH_CONFIG,
-        includeMatches: true,
-      });
-    } catch {
-      searchIndex = [];
-      fuse = null;
-      renderSearchUnavailable();
+          fuse = new FuseCtor(searchIndex, {
+            ...SEARCH_CONFIG,
+            includeMatches: true,
+          });
+        } catch {
+          searchIndex = [];
+          fuse = null;
+          searchIndexPromise = null;
+          renderSearchUnavailable();
+        }
+      })();
     }
+    return searchIndexPromise;
   }
 
   // Escape HTML to prevent XSS

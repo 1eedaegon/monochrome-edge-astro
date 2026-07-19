@@ -25,32 +25,15 @@ export const NAVIGATION = [
   { name: "Code Work", href: `${base}/code` },
 ];
 
+// GH_USERNAME is the CI-injectable alias (GitHub Actions reserves the GITHUB_ env prefix)
+const githubUsername = getEnv("GH_USERNAME", getEnv("GITHUB_USERNAME", ""));
+
 export const SOCIAL_LINKS = {
-  github: getEnv("GITHUB_USERNAME", "")
-    ? `https://github.com/${getEnv("GITHUB_USERNAME", "")}`
-    : "https://github.com/yourusername",
+  github: githubUsername ? `https://github.com/${githubUsername}` : null,
   twitter: getEnv("TWITTER_USERNAME", "")
     ? `https://twitter.com/${getEnv("TWITTER_USERNAME", "")}`
     : null,
-  email: getEnv("EMAIL", "your.email@example.com"),
-};
-
-// Legacy exports (deprecated, use INTEGRATIONS instead)
-export const ANALYTICS = {
-  googleAnalyticsId: getEnv(
-    "GOOGLE_ANALYTICS_ID",
-    getEnv("GA4_MEASUREMENT_ID", ""),
-  ),
-};
-
-export const COMMENTS = {
-  enabled:
-    getEnv("GISCUS_ENABLED", "false") === "true" ||
-    getEnv("COMMENTS_PROVIDER", "none") === "giscus",
-  repo: getEnv("GISCUS_REPO", ""),
-  repoId: getEnv("GISCUS_REPO_ID", ""),
-  category: getEnv("GISCUS_CATEGORY", ""),
-  categoryId: getEnv("GISCUS_CATEGORY_ID", ""),
+  email: getEnv("EMAIL", "") || null,
 };
 
 // New modular integrations system

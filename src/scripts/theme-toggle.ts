@@ -3,7 +3,11 @@ type Mode = 'light' | 'dark' | 'auto';
 
 const THEME_KEY = 'theme-variant';
 const MODE_KEY = 'theme';
-const DEFAULT_THEME: Theme = 'cold';
+
+// The inline script in BaseLayout applies the configured default before render,
+// so the server-set attribute is the single source of truth for the fallback.
+const initialVariant = document.documentElement.getAttribute('data-theme-variant');
+const DEFAULT_THEME: Theme = initialVariant === 'warm' ? 'warm' : 'cold';
 
 /**
  * Get system preference for dark mode
@@ -96,6 +100,9 @@ export function setMode(mode: Mode) {
 
 // Initialize theme immediately to prevent flash
 initTheme();
+
+// Re-apply after client-side navigation (ClientRouter swaps <html> attributes)
+document.addEventListener('astro:after-swap', initTheme);
 
 // Listen for system preference changes
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {

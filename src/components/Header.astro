@@ -1,7 +1,6 @@
 ---
 import { NAVIGATION, SITE } from '../config';
 import SearchBar from './SearchBar.astro';
-import LanguageSwitcher from './LanguageSwitcher.astro';
 import Icon from './Icon.astro';
 
 // Get current path for active state
@@ -22,7 +21,7 @@ const isActive = (href: string) => {
         <span class="logo-text">{SITE.name}</span>
       </a>
 
-      <div class="nav-links" role="list">
+      <div class="nav-links">
         {NAVIGATION.map((item) => (
           <a
             href={item.href}
@@ -35,8 +34,6 @@ const isActive = (href: string) => {
 
       <div class="nav-actions">
         <SearchBar />
-
-        <LanguageSwitcher />
 
         <button
           id="theme-toggle"

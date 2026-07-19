@@ -9,6 +9,8 @@ import SeriesStepper from '../../components/stepper/SeriesStepper.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import Badge from '../../components/ui/Badge.astro';
 import ShareButtons from '../../components/ShareButtons.astro';
+import TOC from '../../components/TOC.astro';
+import { SITE } from '../../config';
 import { resolvePostDates, formatDate, formatDateISO } from '../../utils/git-dates';
 import { calculateReadingTime, formatReadingTime, getWordCount } from '../../utils/reading-time';
 import { buildBacklinkMap, getRelationships } from '../../utils/relationships';
@@ -64,8 +66,16 @@ const Content = rendered.Content;
 const headings = rendered.headings || [];
 
 // Extract H1 from markdown or use frontmatter title
+// (the markdown H1 itself is stripped from the DOM by rehype-strip-h1)
 const h1Heading = headings.find(h => h.depth === 1);
 const titleToShow = h1Heading?.text || post.data.title;
+
+// TOC only lists h2/h3 (the h1 is rendered as the article title)
+const tocHeadings = headings.filter(h => h.depth >= 2 && h.depth <= 3);
+
+// Absolute asset URLs must include the base path (public/ assets live under it)
+const siteLogoUrl = new URL(`${basePath}/logo.png`, SITE.url).href;
+const defaultArticleImage = new URL(`${basePath}/og-image.png`, SITE.url).href;
 
 // Generate breadcrumb items automatically
 const breadcrumbItems = [
@@ -93,6 +103,7 @@ breadcrumbItems.push({
   description={post.data.description}
   ogImage={post.data.ogImage}
   canonical={post.data.canonical}
+  noindex={post.data.draft}
 >
   <!-- Structured Data (JSON-LD) - BlogPosting Schema -->
   <script is:inline type="application/ld+json" slot="head" set:html={JSON.stringify({
@@ -104,23 +115,23 @@ breadcrumbItems.push({
     "dateModified": formatDateISO(dateInfo.updated || dateInfo.date),
     "author": {
       "@type": "Person",
-      "name": "Daegon Lee"
+      "name": SITE.author
     },
     "publisher": {
       "@type": "Organization",
-      "name": "Monochrome Edge",
+      "name": SITE.name,
       "logo": {
         "@type": "ImageObject",
-        "url": `${Astro.site?.toString() || 'https://yourusername.github.io'}/logo.png`
+        "url": siteLogoUrl
       }
     },
-    "image": post.data.ogImage || `${Astro.site?.toString() || 'https://yourusername.github.io'}/og-image.png`,
+    "image": post.data.ogImage || defaultArticleImage,
     "url": post.data.canonical || Astro.url.href,
     "keywords": post.data.tags.join(", "),
     "wordCount": wordCount,
     "timeRequired": `PT${readingTime}M`,
     "articleSection": post.data.category,
-    "inLanguage": "ko"
+    "inLanguage": post.data.lang
   })} />
 
   <ReadingProgress />
@@ -129,6 +140,12 @@ breadcrumbItems.push({
   <main id="main-content" class="container">
     <article class="article-detail">
       <div class="article-layout">
+        {tocHeadings.length > 0 && (
+          <aside class="article-sidebar">
+            <TOC headings={tocHeadings} />
+          </aside>
+        )}
+
         <!-- Main Content (Centered) -->
         <div class="article-content">
           <!-- Breadcrumb Navigation -->
@@ -357,6 +374,12 @@ breadcrumbItems.push({
   .article-layout {
     display: flex;
     justify-content: center;
+    gap: 2.5rem;
+  }
+
+  .article-sidebar {
+    width: 280px;
+    flex-shrink: 0;
   }
 
   .article-content {
@@ -379,6 +402,17 @@ breadcrumbItems.push({
   }
 
   @media (max-width: 1200px) {
+    .article-layout {
+      flex-direction: column;
+    }
+
+    .article-sidebar {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
     .article-content {
       max-width: 100%;
     }
@@ -608,11 +642,6 @@ breadcrumbItems.push({
   .prose :global(li) {
     margin-bottom: 0.375rem;
     line-height: 1.4;
-  }
-
-  /* Hide H1 inside prose (already shown as article-title) */
-  .prose :global(h1) {
-    display: none;
   }
 
   .prose :global(h2),

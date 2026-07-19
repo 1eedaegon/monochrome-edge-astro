@@ -45,7 +45,7 @@ const { series, posts } = Astro.props;
 <BaseLayout title={`Series: ${series}`} description={`All articles in ${series} series`}>
   <Header />
 
-  <main class="container-narrow">
+  <main id="main-content" class="container-narrow">
     <section class="series-header">
       <h1>Series: {series}</h1>
       <p class="series-count">{posts.length} {posts.length === 1 ? 'part' : 'parts'}</p>

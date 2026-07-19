@@ -47,7 +47,7 @@ const { category, posts, count } = Astro.props;
 <BaseLayout title={`Category: ${category}`} description={`All articles in ${category} category`}>
   <Header />
 
-  <main class="container-narrow">
+  <main id="main-content" class="container-narrow">
     <section class="category-header">
       <h1>Category: {category}</h1>
       <p class="category-count">{count} {count === 1 ? 'article' : 'articles'}</p>

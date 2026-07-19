@@ -153,38 +153,50 @@ const toc = generateTOC(headings);
 </style>
 
 <script>
-  // Active heading tracking
-  const observerOptions = {
-    rootMargin: '-100px 0px -66%',
-    threshold: 1,
-  };
+  let headingObserver: IntersectionObserver | null = null;
 
-  const headingObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      const id = entry.target.getAttribute('id');
-      const tocLink = document.querySelector(`.toc-link[href="#${id}"]`);
+  function initTOC() {
+    const toc = document.querySelector('.toc');
+    headingObserver?.disconnect();
+    if (!toc) return;
 
-      if (entry.isIntersecting) {
-        document.querySelectorAll('.toc-link').forEach((link) => {
-          link.classList.remove('active');
+    // Active heading tracking
+    headingObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const id = entry.target.getAttribute('id');
+          document.querySelectorAll('.toc-link').forEach((link) => {
+            link.classList.remove('active');
+          });
+          document.querySelector(`.toc-link[href="#${id}"]`)?.classList.add('active');
         });
-        tocLink?.classList.add('active');
-      }
+      },
+      { rootMargin: '-100px 0px -66%', threshold: 1 }
+    );
+
+    document.querySelectorAll('article h2, article h3').forEach((heading) => {
+      headingObserver?.observe(heading);
     });
-  }, observerOptions);
 
-  // Observe all headings
-  document.querySelectorAll('article h2, article h3').forEach((heading) => {
-    headingObserver.observe(heading);
-  });
-
-  // Mobile: TOC collapse toggle
-  const tocTitle = document.querySelector('.toc-title');
-  const toc = document.querySelector('.toc');
-
-  if (window.innerWidth <= 1024) {
-    tocTitle?.addEventListener('click', () => {
-      toc?.classList.toggle('collapsed');
-    });
+    // Mobile: TOC collapse toggle
+    const tocTitle = toc.querySelector('.toc-title') as HTMLElement | null;
+    if (tocTitle && tocTitle.dataset.initialized !== 'true') {
+      tocTitle.dataset.initialized = 'true';
+      tocTitle.addEventListener('click', () => {
+        if (window.innerWidth <= 1024) {
+          toc.classList.toggle('collapsed');
+        }
+      });
+    }
   }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTOC);
+  } else {
+    initTOC();
+  }
+
+  // Re-initialize after view transitions
+  document.addEventListener('astro:after-swap', initTOC);
 </script>

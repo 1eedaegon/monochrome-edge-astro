@@ -3,8 +3,8 @@
    Based on @monochrome-edge/ui v1.x
    ============================================ */
 
-/* Import Pretendard Font */
-@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+/* Pretendard font is loaded via <link> in BaseLayout.astro (dynamic subset)
+   instead of a render-blocking @import chain. */
 
 /* CSS Reset & Base */
 *,
@@ -492,6 +492,35 @@ blockquote {
 
 .gap-2 {
     gap: 1rem;
+}
+
+/* ============================================
+   Accessibility - Screen Reader Utility
+   ============================================ */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ============================================
+   Accessibility - Reduced Motion
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }
 
 /* ============================================

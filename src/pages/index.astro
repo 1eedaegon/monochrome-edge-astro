@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import { SITE } from '../config';
 import { resolvePostDates } from '../utils/git-dates';
 
 // Get all non-draft articles
@@ -52,7 +53,8 @@ function formatDate(date: Date): string {
 <BaseLayout>
   <Header />
 
-  <main class="container">
+  <main id="main-content" class="container">
+    <h1 class="sr-only">{SITE.title}</h1>
     <div class="archive">
       {years.map((year) => (
         <section class="year-section">
