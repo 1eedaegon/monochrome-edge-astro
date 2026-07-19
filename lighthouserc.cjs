@@ -22,4 +22,4 @@ module.exports = {
       target: 'temporary-public-storage',
     },
   },
-}
+};
