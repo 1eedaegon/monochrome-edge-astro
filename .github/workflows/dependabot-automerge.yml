@@ -11,6 +11,12 @@ on:
   workflow_run:
     workflows: [CI]
     types: [completed]
+  # Daily safety net: a workflow_run event can be missed (e.g. CI was red at the
+  # time and later went green on a rerun). This sweep merges any green, non-major
+  # Dependabot PR still open — matching the monochrome-edge daily-sweep.
+  schedule:
+    - cron: '30 0 * * *' # 09:30 KST, after Dependabot's 09:00 KST run
+  workflow_dispatch: {}
 
 permissions:
   contents: write
@@ -20,6 +26,7 @@ permissions:
 jobs:
   merge:
     if: >
+      github.event_name == 'workflow_run' &&
       github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.event == 'pull_request' &&
       startsWith(github.event.workflow_run.head_branch, 'dependabot/')
@@ -77,3 +84,51 @@ jobs:
           # GITHUB_TOKEN merges don't fire push-triggered workflows;
           # dispatch the deploy explicitly so the update actually ships.
           gh workflow run deploy.yml --repo "$REPO" --ref main
+
+  # Scheduled/manual daily sweep: merge every green, non-major Dependabot PR
+  # still open (checks passed, mergeStateStatus CLEAN). Complements the
+  # workflow_run job above for PRs whose success event was missed.
+  daily-sweep:
+    if: github.event_name != 'workflow_run'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sweep mergeable Dependabot PRs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          # Open Dependabot PRs that are green + mergeable (CLEAN merge state).
+          PRS=$(gh pr list --repo "$REPO" --author "app/dependabot" --state open \
+            --json number,mergeStateStatus \
+            --jq '.[] | select(.mergeStateStatus == "CLEAN") | .number')
+          if [ -z "$PRS" ]; then
+            echo "No green Dependabot PRs to sweep."
+            exit 0
+          fi
+          MERGED=0
+          for PR in $PRS; do
+            TEXT=$(gh pr view "$PR" --repo "$REPO" --json title,body --jq '.title + "\n" + .body')
+            # Same major-bump guard as the workflow_run job: skip cross-major and
+            # anything whose version pair can't be parsed.
+            PAIRS=$(echo "$TEXT" | grep -oiE 'from v?[0-9]+(\.[0-9]+)*([-+][0-9A-Za-z.-]+)? to v?[0-9]+(\.[0-9]+)*' || true)
+            if [ -z "$PAIRS" ]; then
+              echo "PR #$PR: unparseable version bump — leaving for review."
+              continue
+            fi
+            MAJOR=0
+            while read -r _ FROM _ TO; do
+              FM=${FROM#v}; FM=${FM%%.*}; TM=${TO#v}; TM=${TM%%.*}
+              [ "$FM" != "$TM" ] && MAJOR=1
+            done <<< "$PAIRS"
+            if [ "$MAJOR" = "1" ]; then
+              echo "PR #$PR: major bump — leaving for review."
+              continue
+            fi
+            echo "Sweeping PR #$PR (minor/patch, CLEAN)."
+            gh pr merge "$PR" --repo "$REPO" --squash --delete-branch && MERGED=1
+          done
+          # Ship any merged updates (GITHUB_TOKEN merges don't fire push triggers).
+          if [ "$MERGED" = "1" ]; then
+            gh workflow run deploy.yml --repo "$REPO" --ref main || true
+          fi
