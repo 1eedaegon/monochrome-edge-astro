@@ -8,8 +8,9 @@ const currentYear = new Date().getFullYear();
   <div class="container">
     <div class="footer-content">
       <p class="footer-text">
-        © {currentYear}
-        {SITE.author}. All rights reserved.
+        {/* Keep on one line: Astro 7's compiler collapses the newline between
+            two expressions, rendering "20261eedaegon" with no space. */}
+        © {currentYear} {SITE.author}. All rights reserved.
       </p>
       <p class="footer-text">
         Built with <a
