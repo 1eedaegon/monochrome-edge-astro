@@ -25,16 +25,11 @@ test.describe('Article Page', () => {
   });
 
   test('code blocks have copy button', async ({ page }) => {
-    // Find any code block on the page
-    const codeBlock = page.locator('pre code').first();
-    const hasCode = await codeBlock
-      .isVisible({ timeout: 3000 })
-      .catch(() => false);
-
-    if (hasCode) {
-      const copyBtn = page.locator('.copy-button').first();
-      await expect(copyBtn).toBeVisible();
-    }
+    // Fixture article ships code blocks — assert unconditionally instead of
+    // soft-passing when the selector finds nothing.
+    await page.goto('/articles/welcome-to-monochrome-edge/');
+    await expect(page.locator('pre code').first()).toBeVisible();
+    await expect(page.locator('.copy-button').first()).toBeVisible();
   });
 
   test('code blocks keep Shiki colors and stable wrappers', async ({
@@ -87,41 +82,20 @@ test.describe('Article Page', () => {
   });
 
   test('tags link correctly', async ({ page }) => {
+    // Fixture article always carries tags — assert unconditionally.
+    await page.goto('/articles/welcome-to-monochrome-edge/');
     const tagLink = page.locator('.article-tags a').first();
-    const hasTag = await tagLink
-      .isVisible({ timeout: 3000 })
-      .catch(() => false);
-
-    if (hasTag) {
-      const href = await tagLink.getAttribute('href');
-      expect(href).toBeTruthy();
-      await tagLink.click();
-      // Tags link to /articles?tag=xxx
-      await expect(page).toHaveURL(/\/articles\?tag=/);
-    }
+    await expect(tagLink).toBeVisible();
+    const href = await tagLink.getAttribute('href');
+    expect(href).toBeTruthy();
+    await tagLink.click();
+    // Tags link to /articles?tag=xxx
+    await expect(page).toHaveURL(/\/articles\?tag=/);
   });
 
-  test('series navigation shows for series articles', async ({ page }) => {
-    // Go back to home and find a series article if available
-    await page.goto('/');
-
-    // Look for articles with series indicators
-    const seriesArticle = page.locator('a[href*="/articles/"]').first();
-    await seriesArticle.click();
-    await expect(page).toHaveURL(/\/articles\//);
-
-    // Check if series stepper exists (only some articles have it)
-    const seriesStepper = page
-      .locator('.series-stepper, [class*="series"]')
-      .first();
-    const hasSeries = await seriesStepper
-      .isVisible({ timeout: 3000 })
-      .catch(() => false);
-
-    if (hasSeries) {
-      await expect(seriesStepper).toBeVisible();
-    }
-  });
+  // (The former soft-passing "series navigation shows" test was removed: the
+  // deterministic test below already asserts the stepper renders on the
+  // series fixture unconditionally.)
 
   test('series stepper renders through Monochrome Edge package', async ({
     page,
