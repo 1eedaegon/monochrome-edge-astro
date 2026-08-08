@@ -40,16 +40,12 @@ test.describe('Search', () => {
     await page.keyboard.press('Control+k');
 
     const input = page.locator('#search-input');
-    await input.fill('a');
+    // Fixture articles guarantee matches for "astro" — assert unconditionally.
+    await input.fill('astro');
 
     const firstResult = page.locator('.search-result-item').first();
-    // Only proceed if there are results
-    const hasResults = await firstResult
-      .isVisible({ timeout: 5000 })
-      .catch(() => false);
-    if (hasResults) {
-      await firstResult.click();
-      await expect(page).toHaveURL(/\/articles\//);
-    }
+    await expect(firstResult).toBeVisible({ timeout: 5000 });
+    await firstResult.click();
+    await expect(page).toHaveURL(/\/articles\//);
   });
 });
