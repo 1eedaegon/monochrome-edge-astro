@@ -33,7 +33,7 @@
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.61.1",
     "@types/node": "^24.13.0",
-    "eslint": "^10.7.0",
+    "eslint": "^10.8.1",
     "eslint-plugin-astro": "^3.0.1",
     "globals": "^17.7.0",
     "prettier": "^3.9.5",
@@ -45,7 +45,7 @@
     "simple-icons": "^16.27.0",
     "svgo": "^4.0.2",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.64.0"
+    "typescript-eslint": "^8.67.0"
   },
   "overrides": {
     "volar-service-yaml": "0.0.71"
